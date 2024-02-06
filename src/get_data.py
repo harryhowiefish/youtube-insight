@@ -95,7 +95,6 @@ def get_video_info(youtube: googleapiclient.discovery.Resource,
     result['description'] = info['snippet']['description']
     result['thumbnail_url'] = info['snippet']['thumbnails']['high']['url']
     result['duration'] = info['contentDetails']['duration']
-    result['dimension'] = info['contentDetails']['dimension']
     if 'tag' in info['snippet']:
         result['tags'] = info['snippet']['tags']
     if 'categoryId' in info['snippet']:
@@ -120,8 +119,10 @@ def get_video_stat(youtube: googleapiclient.discovery.Resource,
     result = {}
     result['video_id'] = info['id']
     result['view_count'] = info['statistics']['viewCount']
-    result['like_count'] = info['statistics']['likeCount']
-    result['comment_count'] = info['statistics']['commentCount']
+    if 'likeCount' in info['statistics']:
+        result['like_count'] = info['statistics']['likeCount']
+    if 'commentCount' in info['statistics']:
+        result['comment_count'] = info['statistics']['commentCount']
     return result
 
 # search uses to much quota, therefore development as halted

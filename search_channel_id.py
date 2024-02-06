@@ -1,21 +1,16 @@
-from selenium import webdriver
-import re
-from selenium.webdriver.chrome.options import Options
 import sys
+import logging
 import src.get_data as get_data
 import src.db_connection as db_connection
-import logging
+import src.youtube_crawler as youtube_crawler
+
 logging.basicConfig(level=logging.INFO)
 
 
 def main():
     keyword = sys.argv[1]
-    options = Options()
-    options.add_argument('--headless=new')
-    driver = webdriver.Chrome(options=options)
-    driver.get(f'https://www.youtube.com/results?search_query={keyword}')
-    result = re.findall('"channelId":"(.*?)","title":{"simpleText":"(.*?)"}',
-                        driver.page_source)
+    crawler = youtube_crawler.Crawler()
+    result = crawler.keyword_search(keyword)
     idx = 0
     while idx < len(result):
         if input(f'Is this channel {result[idx][1]} correct? ' +

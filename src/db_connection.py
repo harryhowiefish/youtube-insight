@@ -23,7 +23,7 @@ class DB_Connection():
             f"dbname={DBNAME} password={PASSWORD} sslmode=allow"
 
     @contextmanager
-    def _get_cursor(self):
+    def _start_cursor(self):
         conn = psycopg2.connect(self.conn_string)
         cur = conn.cursor()
         try:
@@ -37,17 +37,17 @@ class DB_Connection():
             conn.close()
 
     def insert_df(self, insert_stmt, df):
-        with self._get_cursor() as cur:
+        with self._start_cursor() as cur:
             try:
                 # Execute the INSERT statement for each row in the DataFrame
                 execute_batch(cur, insert_stmt, df.values)
                 # Commit the transaction
-                logging.info('insert transaction complete')
+                logging.info(f'Insert transaction complete. inserted {len(df)} rows.')  # noqa
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
 
     def insert_one(self, insert_stmt, data):
-        with self._get_cursor() as cur:
+        with self._start_cursor() as cur:
             try:
                 # Execute the INSERT statement for each row in the DataFrame
                 cur.execute(insert_stmt, data)
@@ -57,7 +57,7 @@ class DB_Connection():
                 logging.error(f"An error occurred here: {e}")
 
     def query(self, query_stmt):
-        with self._get_cursor() as cur:
+        with self._start_cursor() as cur:
             try:
                 # Execute the INSERT statement for each row in the DataFrame
                 cur.execute(query_stmt)
