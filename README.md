@@ -65,6 +65,12 @@ python3 update_video_stat.py
 ### Visualize result
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
+## Priority
+- fix add_channel_listing
+- add testing
+- add github action
+- change name
+
 ## Working progress
 - airflow automation
 - add method to update channel active status
