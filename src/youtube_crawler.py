@@ -3,6 +3,7 @@ import re
 from selenium.webdriver.chrome.options import Options
 from contextlib import contextmanager
 import logging
+from selenium.common import exceptions as sel_exceptions
 
 
 class Crawler():
@@ -22,8 +23,12 @@ class Crawler():
         driver = webdriver.Chrome(options=self.options)
         try:
             yield driver
+        except sel_exceptions.InvalidArgumentException:
+            logging.error('Invalid argument. Likely bad url.')
+        except sel_exceptions.NoSuchElementException:
+            logging.error("Can't find element. Likely bad url.")
         except Exception as e:
-            logging.error(f"An error occurred: {e}")
+            raise e
         finally:
             driver.quit()
 
@@ -73,14 +78,14 @@ class Crawler():
         tabs = ""
 
         with self._start_driver() as driver:
-            driver.implicitly_wait(100)
+            driver.implicitly_wait(5)
             url = f'https://www.youtube.com/channel/{channel_id}/videos'
             driver.get(url)
             tabs = driver.find_element("xpath", '//*[@id="tabs"]').text
 
         if 'Videos' in tabs:
             with self._start_driver() as driver:
-                driver.implicitly_wait(100)
+                driver.implicitly_wait(5)
                 url = f'https://www.youtube.com/channel/{channel_id}/videos'
                 result['video'] = self._single_page_video_listng(driver, url)
         # with self._start_driver() as driver:
@@ -90,7 +95,7 @@ class Crawler():
         #     tabs = driver.find_element("xpath", '//*[@id="tabs"]').text
         if 'Shorts' in tabs:
             with self._start_driver() as driver:
-                driver.implicitly_wait(100)
+                driver.implicitly_wait(5)
                 url = f'https://www.youtube.com/channel/{channel_id}/shorts'
                 result['short'] = self._single_page_video_listng(driver, url)  # noqa
         return result

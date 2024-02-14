@@ -1,34 +1,64 @@
-# import pytest
-# import json
-# import googleapiclient.discovery
-# import src.get_data as get_data
+import pytest
+from unittest.mock import patch, MagicMock
+from src import get_data
+
+# Sample data to mock the API response
+mock_channel_response = {
+    'items': [{
+        'id': 'test_channel_id',
+        'snippet': {
+            'title': 'Test Channel',
+            'customUrl': 'testchannel',
+            'publishedAt': '2020-01-01T00:00:00Z',
+            'thumbnails': {
+                'high': {
+                    'url': 'http://example.com/thumbnail.jpg'
+                }
+            }
+        },
+        'brandingSettings': {
+            'channel': {
+                'description': 'Test Description',
+                'country': 'Test Country'
+            }
+        }
+    }]
+}
 
 
-def test_dummy():
-    assert 1 == 1
+@pytest.fixture
+def youtube_client():
+    with patch('googleapiclient.discovery.build') as mock_build:
+        mock_youtube = MagicMock()
+        mock_build.return_value = mock_youtube
+        yield mock_youtube
 
-# function get_channel_id no longer in use
-# class TestGetChannelId(object):
 
-#     @pytest.fixture(autouse=True)
-#     def _youtube_resource(self):
-#         api_service_name = "youtube"
-#         api_version = "v3"
-#         with open('config/api.json') as f:
-#             config = json.load(f)
-#         DEVELOPER_KEY = config['YOUTUBE_API']
+def test_get_channel_info_success(youtube_client):
+    # Mock the channels().list().execute() method chain
+    youtube_client.channels().list().execute.return_value = mock_channel_response  # noqa
 
-#         self.youtube = googleapiclient.discovery.build(
-#             api_service_name, api_version, developerKey=DEVELOPER_KEY)
+    # Call the function with a mock channel ID
+    channel_info = get_data.get_channel_info(youtube_client, 'test_channel_id')
 
-#     def test_correct_keyword(self):
-#         actual = get_data.get_channel_id(self.youtube, '這群人')
-#         expected = {'Name': '這群人TGOP',
-#                     'Channel_id': 'UC6FcYHEm7SO1jpu5TKjNXEA'}
-#         msg = f'expected {expected}, got {actual}'
-#         assert actual == expected, msg
+    # Assertions to validate the expected outcomes
+    assert channel_info is not None
+    assert channel_info['channel_id'] == 'test_channel_id'
+    assert channel_info['name'] == 'Test Channel'
+    assert channel_info['customUrl'] == 'testchannel'
+    assert channel_info['published_date'] == '2020-01-01T00:00:00Z'
+    assert channel_info['thumbnail_url'] == 'http://example.com/thumbnail.jpg'
+    assert channel_info['description'] == 'Test Description'
+    assert channel_info['country'] == 'Test Country'
 
-#     def test_bad_keyword(self):
-#         with pytest.raises(ValueError) as excinfo:
-#             get_data.get_channel_id(self.youtube, '百齡果')
-#         assert str(excinfo.value) == 'Cannot find channel'
+
+def test_get_channel_info_not_found(youtube_client):
+    # Mock the API response for a non-existent channel
+    youtube_client.channels().list().execute.return_value = {'items': []}
+
+    # Call the function with a mock channel ID that does not exist
+    channel_info = get_data.get_channel_info(youtube_client,
+                                             'non_existent_channel_id')
+
+    # Assert that the function handles non-existent channels gracefully
+    assert channel_info is None
