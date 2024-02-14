@@ -2,7 +2,7 @@ name: Unit testing
 
 on:
     push:
-        branches: ['main']
+        branches: ['main','unit-testing']
     pull_request:
         branches: ['main']
     
@@ -31,6 +31,6 @@ jobs:
           run: |
             pytest --cov=./ --cov-report=xml
         - name: Upload coverage reports to Codecov
-          uses: codecov/codecov-action@v4.0.1
+          uses: codecov/codecov-action@v3
           env:
               token: ${{ secrets.CODECOV_TOKEN }}
