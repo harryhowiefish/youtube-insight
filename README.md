@@ -51,7 +51,7 @@ option 2: add with channel ids (txt file)
 UCvw1LiGdyulhnGksJlGWB6g,UCGbshtvS9t-8CW11W7TooQg
 ```
 ```
-python3 add_channel_listing.py /channel_id.txt
+python3 add_channel_listing.py channel_id.txt
 ```
 
 <!-- ### Run Airflow server -->
@@ -66,7 +66,6 @@ python3 update_video_stat.py
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
 ## Priority
-- fix add_channel_listing
 - add testing
 - add github action
 - change name
