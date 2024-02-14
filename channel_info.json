@@ -1,0 +1,86 @@
+{
+    "kind": "youtube#channel",
+    "etag": "i_QTp4YkKFf_o0too8d2lR3S4cM",
+    "id": "UCD2KoUc0f4Bv2Bz0mbOah8g",
+    "snippet": {
+        "title": "百靈果News",
+        "description": "歡迎來到百靈果News aka Bailingguo News\n用隨性的對話包裝知識，\n用認真的口吻胡說八道。\n\n我們閒聊也談正經事，讓生硬的國際大事變得鬆軟好入口；\n\n歡迎你加入這外表看似嘴砲，內容卻異於常人的有料聊天。\n\n現場活動百靈果周二夜購票連結：https://comedyclub.kktix.cc/events/tuesday\n\n合作資訊請洽 kk@bailingguonews.com",
+        "customUrl": "@bailingguo",
+        "publishedAt": "2016-04-16T09:14:45Z",
+        "thumbnails": {
+            "default": {
+                "url": "https://yt3.ggpht.com/VKDiN_3CAEgEbPf0GC0GDFb1yIdTIbDOOjvGgMnuyT5xZ3NY5UmwpVAjw1I7ShQx2nhb9Mcr8A=s88-c-k-c0x00ffffff-no-rj",
+                "width": 88,
+                "height": 88
+            },
+            "medium": {
+                "url": "https://yt3.ggpht.com/VKDiN_3CAEgEbPf0GC0GDFb1yIdTIbDOOjvGgMnuyT5xZ3NY5UmwpVAjw1I7ShQx2nhb9Mcr8A=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+            },
+            "high": {
+                "url": "https://yt3.ggpht.com/VKDiN_3CAEgEbPf0GC0GDFb1yIdTIbDOOjvGgMnuyT5xZ3NY5UmwpVAjw1I7ShQx2nhb9Mcr8A=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+            }
+        },
+        "defaultLanguage": "zh-TW",
+        "localized": {
+            "title": "百靈果News",
+            "description": "歡迎來到百靈果News aka Bailingguo News\n用隨性的對話包裝知識，\n用認真的口吻胡說八道。\n\n我們閒聊也談正經事，讓生硬的國際大事變得鬆軟好入口；\n\n歡迎你加入這外表看似嘴砲，內容卻異於常人的有料聊天。\n\n現場活動百靈果周二夜購票連結：https://comedyclub.kktix.cc/events/tuesday\n\n合作資訊請洽 kk@bailingguonews.com"
+        },
+        "country": "TW"
+    },
+    "contentDetails": {
+        "relatedPlaylists": {
+            "likes": "",
+            "uploads": "UUD2KoUc0f4Bv2Bz0mbOah8g"
+        }
+    },
+    "statistics": {
+        "viewCount": "235729985",
+        "subscriberCount": "823000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "1731"
+    },
+    "topicDetails": {
+        "topicIds": [
+            "/m/098wr",
+            "/m/02jjt"
+        ],
+        "topicCategories": [
+            "https://en.wikipedia.org/wiki/Society",
+            "https://en.wikipedia.org/wiki/Entertainment"
+        ]
+    },
+    "status": {
+        "privacyStatus": "public",
+        "isLinked": true,
+        "longUploadsStatus": "longUploadsUnspecified",
+        "madeForKids": false
+    },
+    "brandingSettings": {
+        "channel": {
+            "title": "百靈果News",
+            "description": "歡迎來到百靈果News aka Bailingguo News\n用隨性的對話包裝知識，\n用認真的口吻胡說八道。\n\n我們閒聊也談正經事，讓生硬的國際大事變得鬆軟好入口；\n\n歡迎你加入這外表看似嘴砲，內容卻異於常人的有料聊天。\n\n現場活動百靈果周二夜購票連結：https://comedyclub.kktix.cc/events/tuesday\n\n合作資訊請洽 kk@bailingguonews.com",
+            "keywords": "新聞 國際新聞 趣聞 \"台灣 podcast\" 播客 台灣播客 中文播客 \"中文 podcast\" 國際 時事 taiwanpodcast chinesepodcast",
+            "unsubscribedTrailer": "nkwKeVDZaTg",
+            "defaultLanguage": "zh-TW",
+            "country": "TW"
+        },
+        "image": {
+            "bannerExternalUrl": "https://yt3.googleusercontent.com/VjaRnk7pryM8vPpDdxBc6cO9NO9LT8D0crxg0XtmDY5cvmSMZHVHEXTithHLgdnIUlOCljNsZA"
+        }
+    },
+    "contentOwnerDetails": {},
+    "localizations": {
+        "en_US": {
+            "title": "Bailingguo News",
+            "description": "Welcome to Bailingguo News\n\nWe talk about international news from Taiwanese perspectives. We joke, we laugh and we make fun of everything that we think is funny. Don't be offended"
+        },
+        "zh_TW": {
+            "title": "百靈果News",
+            "description": "歡迎來到百靈果News aka Bailingguo News\n用隨性的對話包裝知識，\n用認真的口吻胡說八道。\n\n我們閒聊也談正經事，讓生硬的國際大事變得鬆軟好入口；\n\n歡迎你加入這外表看似嘴砲，內容卻異於常人的有料聊天。\n\n現場活動百靈果周二夜購票連結：https://comedyclub.kktix.cc/events/tuesday\n\n合作資訊請洽 kk@bailingguonews.com"
+        }
+    }
+}

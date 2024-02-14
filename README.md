@@ -1,6 +1,5 @@
 # Youtube Insights
 
- 
 <!-- ## Introduction -->
 Want to gain insight on youtube channels? This is the tool for you! 
 
