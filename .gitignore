@@ -156,3 +156,4 @@ aws_db_on_off.py
 daily_update.sh
 testing.ipynb
 .DS_Store
+.vscode
