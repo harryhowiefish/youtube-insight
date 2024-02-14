@@ -4,6 +4,14 @@ import logging
 
 
 def start_youtube_connection(path: str) -> googleapiclient.discovery.Resource:
+    '''
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    '''
     api_service_name = "youtube"
     api_version = "v3"
     with open(path) as f:
@@ -20,6 +28,12 @@ def get_channel_info(youtube: googleapiclient.discovery.Resource,
     get channel information including customUrl, publish date,
     thumbnail link, description, country,
     keyword, topic
+
+    Parameters
+    ----------
+
+    Returns
+    -------
     '''
     request = youtube.channels().list(
         part="id,snippet,brandingSettings,topicDetails",
@@ -54,6 +68,12 @@ def get_channel_stat(youtube: googleapiclient.discovery.Resource,
     '''
     get the most recent channel stats
     including total view, sub count and video count
+
+    Parameters
+    ----------
+
+    Returns
+    -------
     '''
     request = youtube.channels().list(
         part="id, statistics",
@@ -78,6 +98,12 @@ def get_video_info(youtube: googleapiclient.discovery.Resource,
     get information on single video including
     publish date, description, thumbnail link,
     tags, categoryId, duration, dimension
+
+    Parameters
+    ----------
+
+    Returns
+    -------
     '''
     request = youtube.videos().list(
         part="contentDetails,id,snippet,status,topicDetails",
@@ -107,6 +133,12 @@ def get_video_stat(youtube: googleapiclient.discovery.Resource,
     '''
     get the most recent video stats
     including view, sub, and comment count
+
+    Parameters
+    ----------
+
+    Returns
+    -------
     '''
     request = youtube.videos().list(
         part="id, statistics",
@@ -115,46 +147,14 @@ def get_video_stat(youtube: googleapiclient.discovery.Resource,
     if not response['items']:  # check if it's empty
         logging.warning(f"Can't find video with id {video_id}")
         # raise ValueError("Cannot find video using video id")
+        return
     info = response['items'][0]
     result = {}
     result['video_id'] = info['id']
-    result['view_count'] = info['statistics']['viewCount']
+    if 'viewCount' in info['statistics']:
+        result['view_count'] = info['statistics']['viewCount']
     if 'likeCount' in info['statistics']:
         result['like_count'] = info['statistics']['likeCount']
     if 'commentCount' in info['statistics']:
         result['comment_count'] = info['statistics']['commentCount']
     return result
-
-# search uses to much quota, therefore development as halted
-# def list_new_videos(youtube: googleapiclient.discovery.Resource,
-#                    channel_id: str) -> dict:
-#     '''
-#     list video posted in the last 30 days by a channel
-#     '''
-#     request = youtube.channels().list(
-#         part="snippet,brandingSettings," +
-#              "statistics,topicDetails",
-#         id=channel_id)
-#     response = request.execute()
-
-#     pass
-
-# search uses to much quota, therefore should no longer be in use
-# def get_channel_id(youtube: googleapiclient.discovery.Resource,
-#                    keyword: str) -> dict:
-#     '''
-#     get channel id from keyword search.
-#     '''
-#     request = youtube.search().list(
-#         part='snippet',
-#         q=keyword)
-#     response = request.execute()
-#     items = response['items']
-#     for item in items:
-#         if keyword.lower() in item['snippet']['channelTitle'].lower():
-#             return {'Name': item['snippet']['channelTitle'],
-#                     'Channel_id': item['snippet']['channelId']}
-#     logging.warning(f"Can't find channel with name {keyword}. " +
-#                     "Were you trying to find " +
-#                     f"{items[0]['snippet']['channelTitle']}")
-#     raise ValueError("Cannot find channel")

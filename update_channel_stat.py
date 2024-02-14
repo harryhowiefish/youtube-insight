@@ -19,6 +19,7 @@ def main():
     stat_df = pd.DataFrame(results)
     stat_df = stat_df.astype({'view_count': 'int', 'video_count': 'int',
                               'sub_count': 'int'})
+    stat_df.to_csv('channel_stats.csv', index=False)
 
     insert_stmt = f"""
     INSERT INTO channel_log ({','.join(stat_df.columns)})

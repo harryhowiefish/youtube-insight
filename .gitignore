@@ -152,5 +152,6 @@ cython_debug/
 #.idea/
 
 secrets.json
-example_json/filtered_channels.json
-example_json/top_97_channels.json
+aws_db_on_off.py
+daily_update.sh
+testing.ipynb

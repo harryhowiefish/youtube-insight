@@ -12,8 +12,7 @@ create table channel(
 	country CHAR(2),
 	keywords text,
 	topic text,
-	created_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-
+	created_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 create table video(
@@ -33,9 +32,9 @@ create table video_log(
 	video_id char(11) references video(video_id),
 	view_count BIGINT not null default 0,
 	like_count int not null default 0,
-	comment_count int not null default 0
+	comment_count int not null default 0,
 	created_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-	"date" date NULL,
+	"date" date NULL
 	
 );
 
@@ -43,9 +42,9 @@ create table channel_log(
 	channel_id char(24) references channel(channel_id),
 	view_count BIGINT not null default 0,
 	sub_count int not null default 0,
-	video_count int not null default 0
+	video_count int not null default 0,
 	created_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-	"date" date NULL,
+	"date" date NULL
 
 );
 
