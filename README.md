@@ -78,6 +78,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 - interactive plotly
 - dashboard with dash
 - count video and shorts during daily insert
+- add hive, mongodb integration
 
 ## Issues
 - if get new video failed to insert, don't update status
