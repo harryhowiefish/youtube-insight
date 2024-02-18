@@ -30,6 +30,9 @@ docker build -t youtube_db .
 docker run --name youtube_db -v mydbdata:/var/lib/postgresql/data -p 5432:5432 -d my_youtube_db
 ```
 
+### Airflor
+docker build -f Dockerfile.airflow . --tag custom_airflow:latest
+
 ### Select channels to track
 
 option 1: search with channel keyword
