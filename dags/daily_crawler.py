@@ -19,7 +19,7 @@ pipeline = DAG(
 
 start_task = BashOperator(
         task_id='spin_up_db',
-        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py on',  # noqa
+        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set on',  # noqa
         dag=pipeline,
         execution_timeout=timedelta(minutes=10)
     )
@@ -44,7 +44,7 @@ update_video = BashOperator(
 
 end_task = BashOperator(
         task_id='initiate_shutdown',
-        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py off',  # noqa
+        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set off',  # noqa
         dag=pipeline,
         execution_timeout=timedelta(minutes=10)
     )
