@@ -14,7 +14,6 @@ def main():
     result = db.query('SELECT channel_id FROM channel where active=True')
     channel_ids = [item[0] for item in result]
     for channel_id in channel_ids:
-        print(channel_id)
         v_ids = crawler.get_video_lists(channel_id)
         video_data = []
         for video_type, video_ids in v_ids.items():
@@ -26,7 +25,7 @@ def main():
                 video_data.append(single_video)
         if not video_data:  # if there's no video crawled
             logging.info(f'{channel_id} has no video to updated.')
-            return
+            continue
 
         video_df = pd.DataFrame(video_data)
         video_df['channel_id'] = channel_id
@@ -68,19 +67,19 @@ def main():
         """
         db.insert_df(insert_stmt, new_vids_df)
 
-        update_stmt = """
-        update channel
-        set active = false
-        where channel_id = %s
-        """
-        with db._start_cursor() as cur:
-            try:
-                # Execute the INSERT statement for each row in the DataFrame
-                cur.execute(update_stmt, (channel_id,))
-                # Commit the transaction
-                logging.info(f'{channel_id} video updated')
-            except Exception as e:
-                logging.error(f"An error occurred here: {e}")
+        # update_stmt = """
+        # update channel
+        # set active = false
+        # where channel_id = %s
+        # """
+        # with db._start_cursor() as cur:
+        #     try:
+        #         # Execute the INSERT statement for each row in the DataFrame
+        #         cur.execute(update_stmt, (channel_id,))
+        #         # Commit the transaction
+        #         logging.info(f'{channel_id} video updated')
+        #     except Exception as e:
+        #         logging.error(f"An error occurred here: {e}")
 
 
 if __name__ == '__main__':

@@ -20,7 +20,9 @@ class Crawler():
         '''
         Create a contextmanager to make sure driver shuts down after every use.
         '''
-        driver = webdriver.Chrome(options=self.options)
+        driver = webdriver.Remote('remote_chromedriver:4444/wd/hub',
+                                  options=self.options)
+        # driver = webdriver.Chrome(options=self.options)
         try:
             yield driver
         except sel_exceptions.InvalidArgumentException:

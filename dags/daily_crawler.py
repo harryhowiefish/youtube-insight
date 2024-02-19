@@ -12,7 +12,7 @@ default_args = {
 pipeline = DAG(
     dag_id='daily_crawler',
     default_args=default_args,
-    schedule_interval='0 18 * * *',
+    schedule_interval='0 9 * * *',
     start_date=datetime(2024, 2, 16),
     catchup=False
 )
@@ -35,11 +35,6 @@ update_channel = BashOperator(
     bash_command='cd /opt/airflow && python airflow_scripts/update_channel_stat.py',  # noqa
     dag=pipeline
 )
-# update_channel = PythonOperator(
-#         task_id='first_task',
-#         python_callable=update_channel_stat.main,
-#         dag=pipeline
-#     )
 
 update_video = BashOperator(
     task_id='refresh_video_stat',

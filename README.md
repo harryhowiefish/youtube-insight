@@ -84,9 +84,10 @@ use the notebooks in the visualization folder to explore insights into your sele
 - add hive, mongodb integration
 
 ## Issues
-- if get new video failed to insert, don't update status
-- bash script if catch exceptions
-
+- if get new video failed to insert, don't update status. Reset status for all before crawling.
+- drop duplicate during crawling
+- set video status with time
+- adjust crawling method to save on API
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
