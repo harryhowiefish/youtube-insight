@@ -30,9 +30,6 @@ docker build -t youtube_db .
 docker run --name youtube_db -v mydbdata:/var/lib/postgresql/data -p 5432:5432 -d my_youtube_db
 ```
 
-### Airflor
-docker build -f Dockerfile.airflow . --tag custom_airflow:latest
-
 ### Select channels to track
 
 option 1: search with channel keyword
@@ -56,14 +53,15 @@ UCvw1LiGdyulhnGksJlGWB6g,UCGbshtvS9t-8CW11W7TooQg
 python3 add_channel_listing.py channel_id.txt
 ```
 
-<!-- ### Run Airflow server -->
+### Run Airflow server (connecting to AWS RDS for postgres Database)
+The following are some important config files to include
+AWS credential is in 
+```
+docker build -f Dockerfile.airflow . --tag custom_airflow:latest
+docker compose up airflow-init
+docker compose up -d
+```
 
-### Crawl data daily (Airflow support to be added)
-```
-python3 crawl_new_videos.py
-python3 update_channel_stat.py 
-python3 update_video_stat.py
-```
 ### Visualize result
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
@@ -74,7 +72,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 - extended testing
 - airflow automation
 - add method to update channel active status
-- add method to update video status 30 days and can't find
+- add status to missing video can't find
 - 30 minute crawl for the first 24 hours
 - 6 hour crawl for the first 7 days
 - 1 day crawl for the 30 days
@@ -82,11 +80,11 @@ use the notebooks in the visualization folder to explore insights into your sele
 - dashboard with dash
 - count video and shorts during daily insert
 - add hive, mongodb integration
+- directly connect postgres to airflow.
 
 ## Issues
-- if get new video failed to insert, don't update status. Reset status for all before crawling.
-- drop duplicate during crawling
-- set video status with time
+- drop duplicate during crawling (likely fixed, need to write tests to confirm)
+- set video status with time (change db setting)
 - adjust crawling method to save on API
 
 ## Resources

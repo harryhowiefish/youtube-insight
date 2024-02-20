@@ -5,10 +5,15 @@ import argparse
 
 
 def main():
+    '''
+    This script creates a faster way to switch on/off AWS RDS.
+    AWS credential is required for this to work.
+    '''
 
     # Parser setting
     parser = argparse.ArgumentParser()
-    parser.add_argument('-set', '--set_status', help='turn db on or off')
+    parser.add_argument('-set', '--set_status', help='turn db on or off',
+                        choices=['on', 'off'])
     parser.add_argument('-check', '--check_status',
                         help='return db current status',
                         action='store_true')
@@ -18,13 +23,14 @@ def main():
     os.environ['AWS_PROFILE'] = "boto3"
     os.environ['AWS_DEFAULT_REGION'] = "ap-southeast-1"
     client = boto3.client('rds')
+    db_name = 'youtube-db'
 
     # get db current status
     info = client.describe_db_instances(
-        DBInstanceIdentifier='youtube-db')['DBInstances'][0]
+        DBInstanceIdentifier=db_name)['DBInstances'][0]
     status = info['DBInstanceStatus']
 
-    # if no args provided
+    #  no args provided
     if not any(vars(args).values()):
         print('Please provide arguments, or check --help for info.')
         return
@@ -48,7 +54,7 @@ def main():
         # wait until db launch complete
         while True:
             info = client.describe_db_instances(
-                DBInstanceIdentifier='youtube-db')['DBInstances'][0]
+                DBInstanceIdentifier=db_name)['DBInstances'][0]
             if info['DBInstanceStatus'] in ['starting',
                                             'Configuring-enhanced-monitoring',
                                             'configuring-enhanced-monitoring']:  # noqa
@@ -73,7 +79,7 @@ def main():
         # wait until db shutdown complete
         while True:
             info = client.describe_db_instances(
-                DBInstanceIdentifier='youtube-db')['DBInstances'][0]
+                DBInstanceIdentifier=db_name)['DBInstances'][0]
             if info['DBInstanceStatus'] == 'stopped':
                 print('DB shutdown successfully')
                 return

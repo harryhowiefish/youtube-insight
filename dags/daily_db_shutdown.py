@@ -20,7 +20,7 @@ db_control = DAG(
 
 start_task = BashOperator(
         task_id='initiate_shutdown',
-        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py off',  # noqa
+        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set off',  # noqa
         dag=db_control,
         execution_timeout=timedelta(minutes=20)
     )

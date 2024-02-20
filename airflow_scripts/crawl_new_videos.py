@@ -60,6 +60,7 @@ def main():
 
         new_vids_df = new_vids_df.reset_index().drop('published_timestamp',
                                                      axis=1)
+        new_vids_df.drop_duplicates(subset='video_id', inplace=True)
 
         insert_stmt = f"""
         INSERT INTO video ({','.join(new_vids_df.columns)})
@@ -67,19 +68,19 @@ def main():
         """
         db.insert_df(insert_stmt, new_vids_df)
 
-        # update_stmt = """
-        # update channel
-        # set active = false
-        # where channel_id = %s
-        # """
-        # with db._start_cursor() as cur:
-        #     try:
-        #         # Execute the INSERT statement for each row in the DataFrame
-        #         cur.execute(update_stmt, (channel_id,))
-        #         # Commit the transaction
-        #         logging.info(f'{channel_id} video updated')
-        #     except Exception as e:
-        #         logging.error(f"An error occurred here: {e}")
+        update_stmt = """
+        update channel
+        set active = false
+        where channel_id = %s
+        """
+        with db._start_cursor() as cur:
+            try:
+                # Execute the INSERT statement for each row in the DataFrame
+                cur.execute(update_stmt, (channel_id,))
+                # Commit the transaction
+                logging.info(f'{channel_id} video updated')
+            except Exception as e:
+                logging.error(f"An error occurred here: {e}")
 
 
 if __name__ == '__main__':
