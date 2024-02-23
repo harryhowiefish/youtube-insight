@@ -6,10 +6,14 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
+    '''
+    This scripts uses youtube API to query the latest stats
+    for the channels with active status in database.
+    '''
     youtube = get_data.start_youtube_connection('config/secrets.json')
     db = db_connection.DB_Connection()
     db.conn_string_from_path('config/secrets.json')
-    result = db.query('SELECT channel_id FROM channel')
+    result = db.query('SELECT channel_id FROM channel WHERE active=True')
     channel_ids = [item[0] for item in result]
     results = []
     for id in channel_ids:

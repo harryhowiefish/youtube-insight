@@ -53,14 +53,15 @@ UCvw1LiGdyulhnGksJlGWB6g,UCGbshtvS9t-8CW11W7TooQg
 python3 add_channel_listing.py channel_id.txt
 ```
 
-<!-- ### Run Airflow server -->
+### Run Airflow server (connecting to AWS RDS for postgres Database)
+The following are some important config files to include
+AWS credential is in 
+```
+docker build -f Dockerfile.airflow . --tag custom_airflow:latest
+docker compose up airflow-init
+docker compose up -d
+```
 
-### Crawl data daily (Airflow support to be added)
-```
-python3 crawl_new_videos.py
-python3 update_channel_stat.py 
-python3 update_video_stat.py
-```
 ### Visualize result
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
@@ -71,18 +72,23 @@ use the notebooks in the visualization folder to explore insights into your sele
 - extended testing
 - airflow automation
 - add method to update channel active status
-- add method to update video status 30 days and can't find
+- add status to missing video can't find
 - 30 minute crawl for the first 24 hours
 - 6 hour crawl for the first 7 days
 - 1 day crawl for the 30 days
 - interactive plotly
 - dashboard with dash
 - count video and shorts during daily insert
+- add hive, mongodb integration
+- directly connect postgres to airflow.
 
 ## Issues
-- if get new video failed to insert, don't update status
-- bash script if catch exceptions
-
+- drop duplicate during crawling (likely fixed, need to write tests to confirm)
+- set video status with time (change db setting)
+- adjust crawling method to save on API
+- implicitly_wait used in crawler.get_video_lists in youtube_crawler currently will return a non-consistent amount of video lists during query. It should be investigated and replaced to something more stable.
+- rewrite get_data into a class
+- replace the video scraping functionality from pytube in order to get rid of selenium (and to make it faster)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

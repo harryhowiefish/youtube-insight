@@ -7,22 +7,33 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
+    '''
+    This script queries active video from the database
+    and get status on the videos via youtube API.
+    '''
+
+    # setup
     youtube = get_data.start_youtube_connection('config/secrets.json')
     db = db_connection.DB_Connection()
     db.conn_string_from_path('config/secrets.json')
 
+    # query list of video to call API.
     result = db.query('SELECT video_id FROM video where active = True')
     video_ids = [item[0] for item in result]
+
+    # youtube API call
     results = []
     for id in video_ids:
         result = get_data.get_video_stat(youtube, id)
         if result:
             results.append(result)
+
+    # create dataframe and save
     stat_df = pd.DataFrame(results)
     stat_df = stat_df.replace([np.nan], [None])
+    # stat_df.to_csv('video_stats.csv', index=False)
 
-    stat_df.to_csv('video_stats.csv', index=False)
-
+    # insert all video stat into database
     insert_stmt = f"""
     INSERT INTO video_log ({','.join(stat_df.columns)})
     VALUES (%s, %s, %s, %s)

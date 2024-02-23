@@ -156,3 +156,5 @@ daily_update.sh
 testing.ipynb
 .DS_Store
 .vscode
+logs/*
+config/airflow.cfg

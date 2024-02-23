@@ -1,7 +1,3 @@
-DROP table if exists video,channel,channel_log,video_log,status_code;
-
-
-
 create table channel(
 	channel_id char(24) primary key,
 	name text not null,

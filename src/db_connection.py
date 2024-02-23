@@ -20,9 +20,12 @@ class DB_Connection():
         ----------
         path : str
 
+        provide config data to create conn_string.
+        self.conn_string added to class.
 
         Returns
         -------
+        None
         '''
         with open(path) as f:
             config = json.load(f)
@@ -86,6 +89,7 @@ class DB_Connection():
                 cur.execute(insert_stmt, data)
                 # Commit the transaction
                 logging.info('insert transaction complete')
+                return cur.rowcount
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
 
@@ -121,7 +125,7 @@ class DB_Connection():
             try:
                 # Execute the INSERT statement for each row in the DataFrame
                 cur.execute(query_stmt)
-                return
+                return cur.rowcount
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
                 return

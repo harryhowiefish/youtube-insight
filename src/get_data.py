@@ -71,6 +71,7 @@ def get_channel_stat(youtube: googleapiclient.discovery.Resource,
 
     Parameters
     ----------
+    youtube: googleapiclient.discovery.Resource
 
     Returns
     -------

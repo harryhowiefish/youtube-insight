@@ -19,8 +19,13 @@ class Crawler():
     def _start_driver(self):
         '''
         Create a contextmanager to make sure driver shuts down after every use.
+        Remote driver is required for crawler to be used along with airflow.
         '''
-        driver = webdriver.Chrome(options=self.options)
+        # ToBeAdded: switch driver type
+        driver = webdriver.Remote('remote_chromedriver:4444/wd/hub',
+                                  options=self.options)
+        # driver = webdriver.Chrome(options=self.options)
+
         try:
             yield driver
         except sel_exceptions.InvalidArgumentException:
@@ -39,6 +44,31 @@ class Crawler():
         limit 20 by default to prevent selenium error due to unloaded page.
         implicitly_wait time is arbiturarily set,
         future exploring might be required.
+
+        Parameters
+        ----------
+        driver: selenium.WebDriver
+
+        an instance of the driver object.
+
+        url: str
+
+        youtube link to crawl.
+        It can be any page with video link / thumbnails.
+
+        limit: int. Default 20
+
+        Limit the number of elements to crawl.
+        This is set to prevent issue with selenium.
+
+        Returns:
+        -------
+        id_list: list
+
+        List of video ids.
+        Length likely be shorter than the limit due to missing href.
+
+        -------
         '''
         driver.get(url)
         videos = driver.find_elements("xpath",
@@ -50,12 +80,21 @@ class Crawler():
 
     def keyword_search(self, keyword: str) -> list:
         '''
+        Search for youtube channel id using keyword via youtube search.
+        Matches are ordered base on the result given on the search page.
+        Result can be None if no channel is suggested by youtube.
 
         Parameters
         ----------
+        keyword: str
 
-        Returns
+        Channel keyword.
+
+        Returns:
         -------
+        channel_list: list
+
+        Return a list of tuples containing channel id and channel name.
         '''
         with self._start_driver() as driver:
             driver.implicitly_wait(1000)
@@ -67,12 +106,24 @@ class Crawler():
 
     def get_video_lists(self, channel_id: str) -> dict:
         '''
+        Look for the most recent video posting from a specified channel.
+        Both video and shorts page will be query.
+        An empty dictionary will be return in the rare case the channel
+        has no video listing on the two pages.
 
         Parameters
         ----------
+        channel_id: str
+
+        Youtube channel_id (CHAR 24).
+        Does not support youtube channel handles.
 
         Returns
         -------
+        video_listing: dict
+
+        Dictionary containing "videos" and/or "shorts" key.
+        Each contain a list of video ids.
         '''
         result = {}
         tabs = ""
@@ -88,11 +139,6 @@ class Crawler():
                 driver.implicitly_wait(5)
                 url = f'https://www.youtube.com/channel/{channel_id}/videos'
                 result['video'] = self._single_page_video_listng(driver, url)
-        # with self._start_driver() as driver:
-        #     driver.implicitly_wait(1000)
-        #     url = f'https://www.youtube.com/channel/{channel_id}/videos'
-        #     result['video'] = self._single_page_video_listng(driver, url)
-        #     tabs = driver.find_element("xpath", '//*[@id="tabs"]').text
         if 'Shorts' in tabs:
             with self._start_driver() as driver:
                 driver.implicitly_wait(5)
