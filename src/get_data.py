@@ -59,7 +59,7 @@ def get_channel_info(youtube: googleapiclient.discovery.Resource,
     if 'topicDetails' in info:
         if 'topicCategories' in info['topicDetails']:
             result['topic'] = info['topicDetails']['topicCategories']
-            result['topic'] = ', '.join([item.split('/')[-1] for item in result['topic']]) # noqa
+            result['topic'] = ', '.join([item.split('/')[-1] for item in result['topic']])  # noqa
     return result
 
 
