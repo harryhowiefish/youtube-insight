@@ -86,6 +86,9 @@ use the notebooks in the visualization folder to explore insights into your sele
 - drop duplicate during crawling (likely fixed, need to write tests to confirm)
 - set video status with time (change db setting)
 - adjust crawling method to save on API
+- implicitly_wait used in crawler.get_video_lists in youtube_crawler currently will return a non-consistent amount of video lists during query. It should be investigated and replaced to something more stable.
+- rewrite get_data into a class
+- replace the video scraping functionality from pytube in order to get rid of selenium (and to make it faster)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

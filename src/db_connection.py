@@ -20,9 +20,12 @@ class DB_Connection():
         ----------
         path : str
 
+        provide config data to create conn_string.
+        self.conn_string added to class.
 
         Returns
         -------
+        None
         '''
         with open(path) as f:
             config = json.load(f)

@@ -2,7 +2,7 @@ import pytest
 from selenium.webdriver.chrome.webdriver import WebDriver
 from src.youtube_crawler import Crawler
 import logging
-
+from unittest.mock import Mock, patch
 LOGGER = logging.getLogger(__name__)
 
 
@@ -19,7 +19,10 @@ def test_init(crawler):
     assert isinstance(crawler, Crawler), "Crawler instance should be created"
 
 
-def test_start_driver_context_manager(crawler):
+@patch('webdriver.Remote')
+def test_start_driver_context_manager(crawler, mock_remote):
+    mock_driver = Mock()
+    mock_remote.return_value = mock_driver
     with crawler._start_driver() as driver:
         assert isinstance(driver, WebDriver
                           ), "Should return a WebDriver instance"
