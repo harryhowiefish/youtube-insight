@@ -82,8 +82,10 @@ use the notebooks in the visualization folder to explore insights into your sele
 - drop duplicate during crawling (likely fixed, need to write tests to confirm)
 - set video status with time (change db setting)
 - adjust crawling method to save on API
-- rewrite get_data into a class
-- replace the video scraping functionality from pytube in order to get rid of selenium (and to make it faster)
+- refactoring
+    - rewrite get_data to class (and rename) (along with tests)
+    - move some function from crawl_new_videos to get_data (along with tests)
+    - rename and rewrite youtube_requests (along with tests)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

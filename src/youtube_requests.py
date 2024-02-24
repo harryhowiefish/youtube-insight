@@ -9,26 +9,25 @@ class Crawler():
     '''
 
     def __init__(self) -> None:
-        self.header = {"User-Agent": "Mozilla/5.0",
-                       "accept-language": "en-US,en"}
+        self.headers = {"User-Agent": "Mozilla/5.0",
+                        "accept-language": "en-US,en"}
         self.yt_api_key = None
 
-    def _single_page_video_listng(self, url: str,
-                                  continuation: str = None) -> list:
+    def _single_page_video_listng(self, url: str, limit: int
+                                  ) -> list:
         '''
         Helper function to crawl the video listing on a single page.
         If continuation is set, use post method to get the next page.
 
         Parameters
         ----------
-        driver: selenium.WebDriver
-
-        an instance of the driver object.
-
         url: str
 
         youtube link to crawl.
         It can be any page with video link / thumbnails.
+
+        continuation: str. Default = None
+        continuation token from the previous loading page.
 
         limit: int. Default 20
 
@@ -40,20 +39,60 @@ class Crawler():
         id_list: list
 
         List of video ids.
-        Length likely be shorter than the limit due to missing href.
 
         -------
         '''
-        if continuation:
-            pass
+        all_vids = []
         resp = requests.get(
-            'https://www.youtube.com/channel/UCHm9SiOLG8UoBT8STWY5mVA/videos',
-            headers=self.header)
+            url,
+            headers=self.headers)
         video_ids = re.findall(
             '"watchEndpoint":{"videoId":"(.*?)",', resp.text)
 
-        logging.info(f'Recieved {len(video_ids)} video from {url}')
-        return video_ids, continuation
+        token = re.findall('"continuationCommand":{"token":"(.*?)",',
+                           resp.text)[0]
+        all_vids.extend(video_ids)
+        while len(all_vids) < limit:
+            video_ids, token = self._continous_video_listing(token)
+            all_vids.extend(video_ids)
+            if not video_ids or not token:
+                break
+
+        logging.info(f'Recieved {min(len(all_vids),limit)} video from {url}')
+        return all_vids[:limit]
+
+    def _continous_video_listing(self, token: str):
+        url, headers, data = self._create_innertube_post_data(token)
+        resp = requests.post(url, headers=headers, data=data)
+        text = resp.text.replace(' ', '').replace('\n', '')
+        video_ids = re.findall('"videoRenderer":{"videoId":"(.*?)",', text)
+        try:
+            next_token = re.findall(
+                '"continuationCommand":{"token":"(.*?)",', text)[0]
+        except IndexError:
+            return video_ids, ''
+        return video_ids, next_token
+
+    def _create_innertube_post_data(self, token):
+        load_more_url = "https://www.youtube.com/youtubei/v1/browse?key=" + \
+            f"{self.yt_api_key}"
+        headers = {
+            "X-YouTube-Client-Name": "1",
+            "X-YouTube-Client-Version": "2.20200720.00.02",
+            "Content-Type": "application/json"
+        }
+        headers.update(self.headers)
+        data_dict = {
+            "continuation": token,
+            "context": {
+                "client": {
+                    "clientName": "WEB",
+                    "clientVersion": "2.20200720.00.02"
+                }
+            }
+        }
+        data = json.dumps(data_dict)
+        return load_more_url, headers, data
 
     def keyword_search(self, keyword: str) -> list:
         '''
@@ -83,9 +122,11 @@ class Crawler():
     def get_channel_tabs(self, channel_id: str) -> list[str]:
         resp = requests.get(
             f'https://www.youtube.com/channel/{channel_id}/',
-            headers=self.header)
+            headers=self.headers)
         tabs = re.findall('{"tabRenderer":(.*?}}.*?}}.*?})}',
                           resp.text)
+        self.yt_api_key = re.findall(
+            '"INNERTUBE_API_KEY":"(.*?)",', resp.text)[0]
         # First tab is always home. And can not be json load properly.
         tabs = [json.loads(item) for item in tabs[1:]]
         tabs = [item['title'] for item in tabs]
@@ -93,7 +134,7 @@ class Crawler():
         return tabs
 
     def get_video_lists(self, channel_id: str,
-                        limit: int | None = None) -> dict[str, list]:
+                        limit: int = 100) -> dict[str, list]:
         '''
         Look for the most recent video posting from a specified channel.
         Both video and shorts page will be query.
@@ -106,6 +147,9 @@ class Crawler():
 
         Youtube channel_id (CHAR 24).
         Does not support youtube channel handles.
+
+        limit: int. Default None
+        set the number of video to crawl
 
         Returns
         -------
@@ -121,8 +165,8 @@ class Crawler():
 
         if 'Videos' in tabs:
             url = f'https://www.youtube.com/channel/{channel_id}/videos'
-            result['video'], _ = self._single_page_video_listng(url)
+            result['video'] = self._single_page_video_listng(url, limit)
         if 'Shorts' in tabs:
             url = f'https://www.youtube.com/channel/{channel_id}/shorts'
-            result['short'], _ = self._single_page_video_listng(url)
+            result['short'] = self._single_page_video_listng(url, limit)
         return result

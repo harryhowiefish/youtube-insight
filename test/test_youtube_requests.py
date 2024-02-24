@@ -5,8 +5,8 @@ class TestSinglePageVideoListing():
 
     @staticmethod
     def test_basic_success():
-        url = 'https://www.youtube.com/@MrBeast/video'
-        result = Crawler().get_channel_tabs(url)
+        channel_id = 'UCX6OQ3DkcsbYNE6H8uQQuVA'
+        result = Crawler().get_channel_tabs(channel_id)
         assert isinstance(result, list)
 
 
