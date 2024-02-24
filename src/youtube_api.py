@@ -9,24 +9,6 @@ class YoutubeAPI():
         self.youtube = self._api_key_from_env(env_path)
         pass
 
-    def _api_key_from_env(self, path: str | None = None
-                          ) -> googleapiclient.discovery.Resource:
-        '''
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        '''
-        api_service_name = "youtube"
-        api_version = "v3"
-        load_dotenv(path)
-        DEVELOPER_KEY = os.environ['YOUTUBE_API']
-
-        return googleapiclient.discovery.build(
-            api_service_name, api_version, developerKey=DEVELOPER_KEY)
-
     def get_channel_info(self,
                          channel_id: str) -> dict:
         '''
@@ -161,3 +143,34 @@ class YoutubeAPI():
         if 'commentCount' in info['statistics']:
             result['comment_count'] = info['statistics']['commentCount']
         return result
+
+    def ids_to_data(self, video_lists: dict) -> list[dict]:
+        video_data = []
+
+        # loop through crawled data to call youtube API
+        for video_type, video_ids in video_lists.items():
+            if not video_ids:  # if there's no video crawled
+                continue
+            for video_id in video_ids:
+                single_video = {'video_type': video_type}
+                single_video.update(self.get_video_info(video_id))
+                video_data.append(single_video)
+        return video_data
+
+    def _api_key_from_env(self, path: str | None = None
+                          ) -> googleapiclient.discovery.Resource:
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        '''
+        api_service_name = "youtube"
+        api_version = "v3"
+        load_dotenv(path)
+        DEVELOPER_KEY = os.environ['YOUTUBE_API']
+
+        return googleapiclient.discovery.build(
+            api_service_name, api_version, developerKey=DEVELOPER_KEY)

@@ -79,10 +79,11 @@ use the notebooks in the visualization folder to explore insights into your sele
 - directly connect postgres to airflow.
 
 ## Issues
-- drop duplicate during crawling (likely fixed, need to write tests to confirm)
 - set video status with time (change db setting)
-- adjust crawling method to save on API
 - refactoring
-    - move some function from crawl_new_videos to get_data (along with tests)
+    - breakdown big main function to smaller chunks
+    - add tests
+    - drop duplicate during crawling (likely fixed, need to write tests to confirm)
+    - adjust crawling method to save on API
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

@@ -2,33 +2,7 @@ import logging
 import pandas as pd
 import isodate
 from src import YoutubeAPI, DB_Connection, Channel
-from googleapiclient.discovery import Resource as yt_resource
 logging.basicConfig(level=logging.INFO)
-
-
-def id_to_data(youtube: yt_resource, video_lists: dict) -> list[dict]:
-    video_data = []
-
-    # loop through crawled data to call youtube API
-    for video_type, video_ids in video_lists.items():
-        if not video_ids:  # if there's no video crawled
-            continue
-        for video_id in video_ids:
-            single_video = {'video_type': video_type}
-            single_video.update(YoutubeAPI().get_video_info(video_id))
-            video_data.append(single_video)
-    return video_data
-
-
-def data_to_df(video_data: list[dict], channel_id: str):
-    # organize into dataframe
-    video_df = pd.DataFrame(video_data)
-    video_df['channel_id'] = channel_id
-    video_df['published_timestamp'] = pd.to_datetime(video_df['published_date']).dt.tz_convert(tz='Asia/Taipei')  # noqa
-    video_df['published_time'] = video_df['published_timestamp'].dt.timetz
-    video_df['published_date'] = video_df['published_timestamp'].dt.date
-    video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
-    return video_df
 
 
 def main():
@@ -65,7 +39,7 @@ def main():
         if not video_lists:
             logging.info(f'{channel_id} has no video to updated.')
             continue
-        video_data = id_to_data(video_lists, youtube)
+        video_data = youtube.ids_to_data(video_lists, youtube)
         video_df = data_to_df(video_data, channel_id)
 
         new_df_list = []
@@ -115,6 +89,17 @@ def main():
                 logging.info(f'{channel_id} video updated')
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
+
+
+def data_to_df(video_data: list[dict], channel_id: str):
+    # organize into dataframe
+    video_df = pd.DataFrame(video_data)
+    video_df['channel_id'] = channel_id
+    video_df['published_timestamp'] = pd.to_datetime(video_df['published_date']).dt.tz_convert(tz='Asia/Taipei')  # noqa
+    video_df['published_time'] = video_df['published_timestamp'].dt.timetz
+    video_df['published_date'] = video_df['published_timestamp'].dt.date
+    video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
+    return video_df
 
 
 if __name__ == '__main__':
