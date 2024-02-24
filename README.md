@@ -86,6 +86,7 @@ use the notebooks in the visualization folder to explore insights into your sele
     - rewrite get_data to class (and rename) (along with tests)
     - move some function from crawl_new_videos to get_data (along with tests)
     - rename and rewrite youtube_requests (along with tests)
+- add env helper function
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
