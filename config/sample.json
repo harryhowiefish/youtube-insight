@@ -1,9 +1,0 @@
-{"YOUTUBE_API":"_________",
-"postgres":{
-    "host":"localhost",
-    "dbname":"youtube",
-    "user":"postgres",
-    "password":"postgres",
-    "sslmode":"allow"
-}
-}

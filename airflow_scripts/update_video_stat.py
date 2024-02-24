@@ -1,4 +1,4 @@
-import src.get_data as get_data
+import src.youtube_api as youtube_api
 import src.db_connection as db_connection
 import pandas as pd
 import numpy as np
@@ -13,7 +13,7 @@ def main():
     '''
 
     # setup
-    youtube = get_data.start_youtube_connection('config/secrets.json')
+    youtube = youtube_api.start_youtube_connection('config/secrets.json')
     db = db_connection.DB_Connection()
     db.conn_string_from_path('config/secrets.json')
 
@@ -24,7 +24,7 @@ def main():
     # youtube API call
     results = []
     for id in video_ids:
-        result = get_data.get_video_stat(youtube, id)
+        result = youtube_api.get_video_stat(youtube, id)
         if result:
             results.append(result)
 

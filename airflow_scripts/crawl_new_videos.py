@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import isodate
-from src import get_data, db_connection, youtube_requests
+from src import db_connection, youtube_api, youtube_requests
 from googleapiclient.discovery import Resource as yt_resource
 logging.basicConfig(level=logging.INFO)
 
@@ -15,7 +15,7 @@ def id_to_data(youtube: yt_resource, video_lists: dict) -> list[dict]:
             continue
         for video_id in video_ids:
             single_video = {'video_type': video_type}
-            single_video.update(get_data.get_video_info(youtube, video_id))
+            single_video.update(youtube_api.get_video_info(youtube, video_id))
             video_data.append(single_video)
     return video_data
 
@@ -47,7 +47,7 @@ def main():
     '''
 
     # setup connections (youtube API, db and crawler)
-    youtube = get_data.start_youtube_connection('config/secrets.json')
+    youtube = youtube_api.start_youtube_connection('config/secrets.json')
     db = db_connection.DB_Connection()
     db.conn_string_from_path('config/secrets.json')
     crawler = youtube_requests.Crawler()
