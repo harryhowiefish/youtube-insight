@@ -12,10 +12,11 @@ class DB_Connection():
     Include methods to help with DB manipulation.
     '''
 
-    def __init__(self):
+    def __init__(self, env_path: str | None = None):
+        self.conn_string = self._conn_string_from_env(env_path)
         pass
 
-    def conn_string_from_env(self, path: str | None = None) -> None:
+    def _conn_string_from_env(self, path: str | None = None) -> None:
         '''
 
         Parameters
@@ -36,7 +37,7 @@ class DB_Connection():
         DBNAME = os.environ['pg_dbname']
         PASSWORD = os.environ['pg_password']
 
-        self.conn_string = f"host={HOST} user={USER} " + \
+        return f"host={HOST} user={USER} " + \
             f"dbname={DBNAME} password={PASSWORD} sslmode=allow"
 
     @contextmanager

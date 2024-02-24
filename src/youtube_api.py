@@ -5,7 +5,8 @@ import os
 
 
 class YoutubeAPI():
-    def __init__(self) -> None:
+    def __init__(self, env_path: str | None = None) -> None:
+        self.youtube = self._api_key_from_env(env_path)
         pass
 
     def _api_key_from_env(self, path: str | None = None
@@ -25,9 +26,6 @@ class YoutubeAPI():
 
         return googleapiclient.discovery.build(
             api_service_name, api_version, developerKey=DEVELOPER_KEY)
-
-    def start(self, path: str | None = None):
-        self.youtube = self._api_key_from_env(path)
 
     def get_channel_info(self,
                          channel_id: str) -> dict:

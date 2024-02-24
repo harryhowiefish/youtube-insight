@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import isodate
-from src import db_connection, youtube_api, youtube_requests
+from src import YoutubeAPI, DB_Connection, Channel
 from googleapiclient.discovery import Resource as yt_resource
 logging.basicConfig(level=logging.INFO)
 
@@ -15,7 +15,7 @@ def id_to_data(youtube: yt_resource, video_lists: dict) -> list[dict]:
             continue
         for video_id in video_ids:
             single_video = {'video_type': video_type}
-            single_video.update(youtube_api.get_video_info(youtube, video_id))
+            single_video.update(YoutubeAPI().get_video_info(video_id))
             video_data.append(single_video)
     return video_data
 
@@ -47,10 +47,8 @@ def main():
     '''
 
     # setup connections (youtube API, db and crawler)
-    youtube = youtube_api.start_youtube_connection('config/secrets.json')
-    db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
-    crawler = youtube_requests.Crawler()
+    youtube = YoutubeAPI()
+    db = DB_Connection()
 
     # set all channels as active
     # (Future work: this should be moved to a separate task in DAG)
@@ -62,7 +60,8 @@ def main():
 
     for channel_id in channel_ids:
         # use crawler the get video
-        video_lists = crawler.get_video_lists(channel_id)
+        c = Channel(channel_id)
+        video_lists = c.get_video_lists()
         if not video_lists:
             logging.info(f'{channel_id} has no video to updated.')
             continue

@@ -21,7 +21,7 @@ class Channel():
         return self.get_channel_tabs()
 
     def get_video_lists(self,
-                        limit: int = 100) -> dict[str, list]:
+                        limit: int = 20) -> dict[str, list]:
         '''
         Look for the most recent video posting from a specified channel.
         Both video and shorts page will be query.

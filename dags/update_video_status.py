@@ -12,9 +12,9 @@ default_args = {
 def status_update():
     from src import db_connection
     db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
+    db.conn_string_from_env()
     rowcount = db.update(
-          '''
+        '''
           update video
           set active = False
           where published_date < current_date - interval '30 day'
@@ -35,7 +35,7 @@ start_task = BashOperator(
         task_id='spin_up_db',
         bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set on',  # noqa
         dag=update_video_status,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 sql_update = PythonOperator(
@@ -48,7 +48,7 @@ end_task = BashOperator(
         task_id='initiate_shutdown',
         bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set off',  # noqa
         dag=update_video_status,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 start_task >> sql_update

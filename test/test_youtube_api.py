@@ -42,7 +42,6 @@ def API_object(youtube_client):
 
 
 def test_start(API_object, youtube_client):
-    API_object.start()
     assert API_object.youtube == youtube_client
 
 
@@ -51,7 +50,6 @@ def test_get_channel_info_success(API_object, youtube_client):
     youtube_client.channels().list().execute.return_value = mock_channel_response  # noqa
 
     # Call the function with a mock channel ID
-    API_object.start()
     channel_info = API_object.get_channel_info(
         'test_channel_id')
 
@@ -71,7 +69,6 @@ def test_get_channel_info_not_found(API_object, youtube_client):
     youtube_client.channels().list().execute.return_value = {'items': []}
 
     # Call the function with a mock channel ID that does not exist
-    API_object.start()
     channel_info = API_object.get_channel_info('non_existent_channel_id')
 
     # Assert that the function handles non-existent channels gracefully
