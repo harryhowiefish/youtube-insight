@@ -1,6 +1,6 @@
 import sys
 import logging
-import src.get_data as get_data
+import src.youtube_api as youtube_api
 import src.db_connection as db_connection
 import src.youtube_requests as youtube_requests
 
@@ -32,8 +32,8 @@ def main():
         return
 
     # get channel information using youtube API
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    result = get_data.get_channel_info(youtube, result[idx][0])
+    youtube = youtube_api.start_youtube_connection('config/secrets.json')
+    result = youtube_api.get_channel_info(youtube, result[idx][0])
     # adding final result to DB
     db = db_connection.DB_Connection()
     db.conn_string_from_path('config/secrets.json')

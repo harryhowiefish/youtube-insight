@@ -25,8 +25,8 @@ class TestDataToDf():
         date = timestamp.date()
         expected = pd.DataFrame(
             {
-                'video_type': [data['video_type']],
                 'video_id': [data['video_id']],
+                'video_type': [data['video_type']],
                 'title': [data['title']],
                 'published_date': [date],
                 'description': [data['description']],
@@ -37,5 +37,5 @@ class TestDataToDf():
                 'published_timestamp': [timestamp],
                 'published_time': [time],
             }
-        )
+        ).set_index('video_id')
         assert result['channel_id'].equals(expected['channel_id'])
