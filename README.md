@@ -80,6 +80,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 
 ## Issues
 - set video status with time (change db setting)
+- rewrite two files in add channels
 - add env helper function
     - breakdown big main function to smaller chunks and fix filter logic (urgent)
     - add tests

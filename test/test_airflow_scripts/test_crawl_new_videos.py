@@ -1,4 +1,4 @@
-from airflow_scripts import crawl_new_videos
+from src.airflow_scripts import crawl_new_videos
 import pandas as pd
 import datetime
 import pytz

@@ -1,4 +1,4 @@
-from src import YoutubeAPI, DB_Connection
+from src.core import YoutubeAPI, DB_Connection
 import pandas as pd
 import numpy as np
 import logging

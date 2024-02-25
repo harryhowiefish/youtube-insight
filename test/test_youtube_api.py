@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from src import youtube_api
+from src.core import youtube_api
 
 # Sample data to mock the API response
 mock_channel_response = {
@@ -28,7 +28,7 @@ mock_channel_response = {
 
 @pytest.fixture
 def youtube_client():
-    with patch('src.youtube_api.YoutubeAPI._api_key_from_env') as mock_build:
+    with patch('src.core.youtube_api.YoutubeAPI._api_key_from_env') as mock_build:  # noqa
         mock_youtube = MagicMock()
         mock_build.return_value = mock_youtube
         yield mock_youtube

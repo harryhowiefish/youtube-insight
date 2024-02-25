@@ -1,7 +1,7 @@
 import sys
 import logging
 import pandas as pd
-from src import DB_Connection, YoutubeAPI
+from src.core import DB_Connection, YoutubeAPI
 
 logging.basicConfig(level=logging.INFO)
 

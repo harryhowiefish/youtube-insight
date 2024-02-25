@@ -1,6 +1,6 @@
 import sys
 import logging
-from src import DB_Connection, YoutubeAPI, youtube_requests
+from src.core import DB_Connection, YoutubeAPI, youtube_requests
 
 logging.basicConfig(level=logging.INFO)
 

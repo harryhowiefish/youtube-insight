@@ -1,4 +1,4 @@
-from src import youtube_requests
+from src.core import youtube_requests
 import pytest
 
 

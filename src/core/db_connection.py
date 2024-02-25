@@ -3,7 +3,7 @@ from psycopg2.extras import execute_batch
 import logging
 from contextlib import contextmanager
 import pandas as pd
-from dotenv import load_dotenv
+from src import utils
 import os
 
 
@@ -12,12 +12,13 @@ class DB_Connection():
     Include methods to help with DB manipulation.
     '''
 
-    def __init__(self, env_path: str = os.path.join(os.getcwd(), '.ENV')):
+    def __init__(self, env_path: str | None = None
+                 ) -> None:
         self.conn_string = self._conn_string_from_env(env_path)
         pass
 
     def _conn_string_from_env(self,
-                              path: str) -> None:
+                              path: str | None) -> None:
         '''
 
         Parameters
@@ -31,8 +32,7 @@ class DB_Connection():
         -------
         None
         '''
-        load_dotenv(path)
-
+        utils.load_env(path)
         HOST = os.environ['pg_host']
         USER = os.environ['pg_user']
         DBNAME = os.environ['pg_dbname']

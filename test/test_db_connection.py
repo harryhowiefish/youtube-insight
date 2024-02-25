@@ -1,6 +1,6 @@
 import pytest  # noqa
 from unittest.mock import patch, MagicMock  # noqa
-from src.db_connection import DB_Connection
+from src.core import DB_Connection
 import os
 
 

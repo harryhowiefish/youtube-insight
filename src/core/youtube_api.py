@@ -1,11 +1,11 @@
 import googleapiclient.discovery
 import logging
-from dotenv import load_dotenv
+from src import utils
 import os
 
 
 class YoutubeAPI():
-    def __init__(self, env_path: str = os.path.join(os.getcwd(), '.ENV')
+    def __init__(self, env_path: str | None = None
                  ) -> None:
         self.youtube = self._api_key_from_env(env_path)
         pass
@@ -158,7 +158,7 @@ class YoutubeAPI():
                 video_data.append(single_video)
         return video_data
 
-    def _api_key_from_env(self, path: str
+    def _api_key_from_env(self, path: str | None
                           ) -> googleapiclient.discovery.Resource:
         '''
 
@@ -170,7 +170,7 @@ class YoutubeAPI():
         '''
         api_service_name = "youtube"
         api_version = "v3"
-        load_dotenv(path)
+        utils.load_env(path)
         DEVELOPER_KEY = os.environ['YOUTUBE_API']
 
         return googleapiclient.discovery.build(

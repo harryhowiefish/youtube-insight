@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import isodate
-from src import YoutubeAPI, DB_Connection, Channel
+from src.core import YoutubeAPI, DB_Connection, Channel
 logging.basicConfig(level=logging.INFO)
 
 
