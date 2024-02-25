@@ -106,7 +106,7 @@ class Channel():
             url,
             headers=self.headers)
         video_ids = re.findall(
-            '"watchEndpoint":{"videoId":"(.*?)",', resp.text)
+            'Endpoint":{"videoId":"(.*?)",', resp.text)
 
         token = re.findall('"continuationCommand":{"token":"(.*?)",',
                            resp.text)[0]
@@ -152,6 +152,12 @@ class Channel():
         }
         data = json.dumps(data_dict)
         return load_more_url, headers, data
+
+    def _raw_html(self, url: str) -> str:
+        resp = requests.get(
+            url,
+            headers=self.headers)
+        return resp.text
 
 
 def keyword_search(keyword: str) -> list:

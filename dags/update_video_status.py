@@ -12,7 +12,6 @@ default_args = {
 def status_update():
     from src import db_connection
     db = db_connection.DB_Connection()
-    db.conn_string_from_env()
     rowcount = db.update(
         '''
           update video

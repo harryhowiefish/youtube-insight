@@ -5,7 +5,8 @@ import os
 
 
 class YoutubeAPI():
-    def __init__(self, env_path: str | None = None) -> None:
+    def __init__(self, env_path: str = os.path.join(os.getcwd(), '.ENV')
+                 ) -> None:
         self.youtube = self._api_key_from_env(env_path)
         pass
 
@@ -157,7 +158,7 @@ class YoutubeAPI():
                 video_data.append(single_video)
         return video_data
 
-    def _api_key_from_env(self, path: str | None = None
+    def _api_key_from_env(self, path: str
                           ) -> googleapiclient.discovery.Resource:
         '''
 

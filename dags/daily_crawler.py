@@ -5,7 +5,7 @@ from airflow.operators.bash import BashOperator
 # from airflow_scripts import update_channel_stat
 default_args = {
     'owner': 'Harry',
-    'retries': 2,
+    'retries': 0,
     'retry_delay': timedelta(minutes=1)
 }
 

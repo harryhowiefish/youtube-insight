@@ -26,7 +26,7 @@ def main():
 
     # set all channels as active
     # (Future work: this should be moved to a separate task in DAG)
-    db.update('UPDATE channel SET active=True')
+    # db.update('UPDATE channel SET active=True')
 
     # get the channel ids from db
     result = db.query('SELECT channel_id FROM channel where active=True')
@@ -36,10 +36,10 @@ def main():
         # use crawler the get video
         c = Channel(channel_id)
         video_lists = c.get_video_lists()
-        if not video_lists:
+        if not video_lists or all([not item for item in video_lists.values()]):
             logging.info(f'{channel_id} has no video to updated.')
             continue
-        video_data = youtube.ids_to_data(video_lists, youtube)
+        video_data = youtube.ids_to_data(video_lists)
         video_df = data_to_df(video_data, channel_id)
 
         new_df_list = []
@@ -70,11 +70,12 @@ def main():
                                                      axis=1)
         new_vids_df.drop_duplicates(subset='video_id', inplace=True)
 
-        insert_stmt = f"""
-        INSERT INTO video ({','.join(new_vids_df.columns)})
-        VALUES ({','.join(['%s']*new_vids_df.shape[1])})
-        """
-        db.insert_df(insert_stmt, new_vids_df)
+        if len(new_vids_df) > 0:
+            insert_stmt = f"""
+            INSERT INTO video ({','.join(new_vids_df.columns)})
+            VALUES ({','.join(['%s']*new_vids_df.shape[1])})
+            """
+            db.insert_df(insert_stmt, new_vids_df)
 
         update_stmt = """
         update channel
@@ -99,6 +100,7 @@ def data_to_df(video_data: list[dict], channel_id: str):
     video_df['published_time'] = video_df['published_timestamp'].dt.timetz
     video_df['published_date'] = video_df['published_timestamp'].dt.date
     video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
+    video_df.set_index('video_id', inplace=True)
     return video_df
 
 

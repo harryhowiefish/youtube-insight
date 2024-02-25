@@ -55,9 +55,8 @@ python3 add_channel_listing.py channel_id.txt
 
 ### Run Airflow server (connecting to AWS RDS for postgres Database)
 The following are some important config files to include
-AWS credential is in 
+AWS credential is in ~/.aws and .ENV file exist.
 ```
-docker build -f Dockerfile.airflow . --tag custom_airflow:latest
 docker compose up airflow-init
 docker compose up -d
 ```
@@ -77,13 +76,15 @@ use the notebooks in the visualization folder to explore insights into your sele
 - count video and shorts during daily insert
 - add hive, mongodb integration
 - directly connect postgres to airflow.
+- add file cleanup code for airflow + other airflow optimization
 
 ## Issues
 - set video status with time (change db setting)
 - refactoring
-    - breakdown big main function to smaller chunks
+    - breakdown big main function to smaller chunks and fix filter logic (urgent)
     - add tests
     - drop duplicate during crawling (likely fixed, need to write tests to confirm)
-    - adjust crawling method to save on API
+    - adjust crawling method to save on API (crawl and match)
+    - move airflow scripts to main
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

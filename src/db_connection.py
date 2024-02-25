@@ -12,11 +12,12 @@ class DB_Connection():
     Include methods to help with DB manipulation.
     '''
 
-    def __init__(self, env_path: str | None = None):
+    def __init__(self, env_path: str = os.path.join(os.getcwd(), '.ENV')):
         self.conn_string = self._conn_string_from_env(env_path)
         pass
 
-    def _conn_string_from_env(self, path: str | None = None) -> None:
+    def _conn_string_from_env(self,
+                              path: str) -> None:
         '''
 
         Parameters
