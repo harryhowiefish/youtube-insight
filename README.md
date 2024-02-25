@@ -86,5 +86,7 @@ use the notebooks in the visualization folder to explore insights into your sele
     - drop duplicate during crawling (likely fixed, need to write tests to confirm)
     - adjust crawling method to save on API (crawl and match)
     - move airflow scripts to main
+
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
+[pytube: for downloading video and other info from youtube](https://github.com/pytube/pytube)
