@@ -1,5 +1,4 @@
-import src.get_data as get_data
-import src.db_connection as db_connection
+from src import YoutubeAPI, DB_Connection
 import pandas as pd
 import numpy as np
 import logging
@@ -13,9 +12,8 @@ def main():
     '''
 
     # setup
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
+    youtube = YoutubeAPI()
+    db = DB_Connection()
 
     # query list of video to call API.
     result = db.query('SELECT video_id FROM video where active = True')
@@ -24,7 +22,7 @@ def main():
     # youtube API call
     results = []
     for id in video_ids:
-        result = get_data.get_video_stat(youtube, id)
+        result = youtube.get_video_stat(id)
         if result:
             results.append(result)
 

@@ -5,7 +5,7 @@ from airflow.operators.bash import BashOperator
 # from airflow_scripts import update_channel_stat
 default_args = {
     'owner': 'Harry',
-    'retries': 2,
+    'retries': 0,
     'retry_delay': timedelta(minutes=1)
 }
 
@@ -21,7 +21,7 @@ start_task = BashOperator(
         task_id='spin_up_db',
         bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set on',  # noqa
         dag=pipeline,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 new_video = BashOperator(
@@ -46,7 +46,7 @@ end_task = BashOperator(
         task_id='initiate_shutdown',
         bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set off',  # noqa
         dag=pipeline,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 start_task >> new_video
