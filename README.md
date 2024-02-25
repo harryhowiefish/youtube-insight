@@ -66,8 +66,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 
 ## Working progress
 - extended testing
-- add method to update channel active status
-- add status to missing video can't find
+- 
 - 30 minute crawl for the first 24 hours
 - 6 hour crawl for the first 7 days
 - 1 day crawl for the 30 days
@@ -80,13 +79,9 @@ use the notebooks in the visualization folder to explore insights into your sele
 
 ## Issues
 - set video status with time (change db setting)
-- rewrite two files in add channels
-- add env helper function
-    - breakdown big main function to smaller chunks and fix filter logic (urgent)
-    - add tests
-    - drop duplicate during crawling (likely fixed, need to write tests to confirm)
-    - adjust crawling method to save on API (crawl and match)
-    - move airflow scripts to main
+- add status to missing video can't find
+- add tests
+- drop duplicate during crawling (likely fixed, need to write tests to confirm)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

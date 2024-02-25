@@ -9,11 +9,10 @@ def main():
     '''
     This script involve 5 steps to crawl new videos from youtube channels
     1. Query database to retrieve (active) youtube channels to crawl
-    2. Use selenium to crawl video id of the most recent ~20 video and shorts
-    3. Use youtube API to crawl video info using id
-    4. Filter videos crawled, so that they are newer than the 5 most recent
-       videos datapoint in database
-    5. Add the filtered list to database.
+    2. Use to crawl video id of the most recent 20 video and shorts
+    3. Filter videos crawled, so that they do not exist in the database
+    4. Use youtube API to crawl video info using id
+    5. Add the new info to database.
 
     Channels in the database have active tags which are which are set as true
     at the start and set as false after they are crawled.
@@ -25,71 +24,98 @@ def main():
     db = DB_Connection()
 
     # set all channels as active
-    # (Future work: this should be moved to a separate task in DAG)
-    # db.update('UPDATE channel SET active=True')
+    # TODO this is only temporarily used to catch errors
+    # Can be deleted alongside all the deactivate calls
+    db.update('UPDATE channel SET active=True')
 
     # get the channel ids from db
     result = db.query('SELECT channel_id FROM channel where active=True')
     channel_ids = [item[0] for item in result]
-
+    total_vids = 0
     for channel_id in channel_ids:
         # use crawler the get video
-        c = Channel(channel_id)
-        video_lists = c.get_video_lists()
-        if not video_lists or all([not item for item in video_lists.values()]):
-            logging.info(f'{channel_id} has no video to updated.')
+        new_videos = scrape_video_by_channel_id(channel_id)
+        if not new_videos:
+            deactive_channel(channel_id, new_tag=False)
             continue
+
+        exisiting_videos = channel_vids(channel_id)
+        video_lists = filter_videos(new_videos, exisiting_videos)
+
+        # check if both video and short has no new video
+        if all([not item for item in video_lists.values()]):
+            deactive_channel(channel_id, new_tag=False)
+            continue
+
         video_data = youtube.ids_to_data(video_lists)
         video_df = data_to_df(video_data, channel_id)
+        video_df.to_csv(f'{channel_id}_videos.csv', index=False)
 
-        new_df_list = []
-        for video_type in ['video', 'short']:
-            query_stmt = f"""
+        insert_stmt = f"""
+        INSERT INTO video ({','.join(video_df.columns)})
+        VALUES ({','.join(['%s']*video_df.shape[1])})
+        """
+        db.insert_df(insert_stmt, video_df)
+        total_vids += len(video_df)
+        deactive_channel(channel_id, new_tag=True)
+
+    logging.info('New video loading complete.' +
+                 f'Total of {total_vids} videos were added.')
+
+
+def scrape_video_by_channel_id(channel_id: str,
+                               count: int | None = None) -> dict[str, list]:
+    c = Channel(channel_id)
+    if not count:
+        video_lists = c.get_video_lists()
+    else:
+        video_lists = c.get_video_lists(count)
+    if not video_lists or all([not item for item in video_lists.values()]):
+        return None
+
+    return video_lists
+
+
+def channel_vids(channel_id: str) -> dict[str, list]:
+    existing_vids = {}
+    db = DB_Connection()
+    for video_type in ['video', 'short']:
+        query_stmt = f"""
             select video_id
             from video
             where channel_id = '{channel_id}' and video_type='{video_type}'
-            order by published_date + published_time desc
-            limit 5
             """
-            result = db.query(query_stmt)
-            existing_v_ids = [item[0] for item in result]
-            while existing_v_ids:
-                if existing_v_ids[0] in video_df.index:
-                    break
-                existing_v_ids.pop(0)
-            if existing_v_ids:
-                new_df_list.append(
-                    video_df[(video_df['published_timestamp'] >
-                              video_df.at[existing_v_ids[0], 'published_timestamp']) &  # noqa
-                             (video_df['video_type'] == video_type)])
-            else:
-                new_df_list.append(video_df[video_df['video_type'] == video_type])  # noqa
-        new_vids_df = pd.concat(new_df_list)
+        result = db.query(query_stmt)
+        existing_vids[video_type] = [item[0] for item in result]
+    return existing_vids
 
-        new_vids_df = new_vids_df.reset_index().drop('published_timestamp',
-                                                     axis=1)
-        new_vids_df.drop_duplicates(subset='video_id', inplace=True)
 
-        if len(new_vids_df) > 0:
-            insert_stmt = f"""
-            INSERT INTO video ({','.join(new_vids_df.columns)})
-            VALUES ({','.join(['%s']*new_vids_df.shape[1])})
-            """
-            db.insert_df(insert_stmt, new_vids_df)
+def filter_videos(new_videos: dict, existing_videos: dict):
+    video_lists = {}
+    for key, value in new_videos.items():
+        video_lists[key] = []
+        for id in value:
+            if id not in existing_videos[key]:
+                video_lists[key].append(id)
+    return video_lists
 
-        update_stmt = """
-        update channel
-        set active = false
-        where channel_id = %s
-        """
-        with db._start_cursor() as cur:
-            try:
-                # Execute the INSERT statement for each row in the DataFrame
-                cur.execute(update_stmt, (channel_id,))
-                # Commit the transaction
-                logging.info(f'{channel_id} video updated')
-            except Exception as e:
-                logging.error(f"An error occurred here: {e}")
+
+def update_channel_status(channel_id):
+    db = DB_Connection()
+    update_stmt = """
+                  update channel
+                  set active = false
+                  where channel_id = %s
+                  """
+    with db._start_cursor() as cur:
+        try:
+            # Execute the INSERT statement for each row in the DataFrame
+            cur.execute(update_stmt, (channel_id,))
+            # Commit the transaction
+            logging.info(f'{channel_id} video updated')
+        except Exception as e:
+            logging.error(f"An error occurred here: {e}")
+    return
 
 
 def data_to_df(video_data: list[dict], channel_id: str):
@@ -100,8 +126,29 @@ def data_to_df(video_data: list[dict], channel_id: str):
     video_df['published_time'] = video_df['published_timestamp'].dt.timetz
     video_df['published_date'] = video_df['published_timestamp'].dt.date
     video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
-    video_df.set_index('video_id', inplace=True)
+    video_df.drop('published_timestamp', axis=1, inplace=True)
+    video_df.drop_duplicates(subset='video_id', inplace=True)
     return video_df
+
+
+def deactive_channel(channel_id: str, new_tag: bool) -> None:
+    db = DB_Connection()
+    update_stmt = """
+    update channel
+    set active = false
+    where channel_id = %s
+    """
+    with db._start_cursor() as cur:
+        try:
+            # Execute the INSERT statement for each row in the DataFrame
+            cur.execute(update_stmt, (channel_id,))
+            # Commit the transaction
+            if new_tag:
+                logging.info(f'{channel_id} video updated')
+            else:
+                logging.info(f"{channel_id} has no video to update")
+        except Exception as e:
+            logging.error(f"An error occurred here: {e}")
 
 
 if __name__ == '__main__':

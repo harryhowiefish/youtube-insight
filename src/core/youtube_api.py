@@ -2,6 +2,7 @@ import googleapiclient.discovery
 import logging
 from src import utils
 import os
+from googleapiclient.errors import HttpError
 
 
 class YoutubeAPI():
@@ -26,8 +27,12 @@ class YoutubeAPI():
         request = self.youtube.channels().list(
             part="id,snippet,brandingSettings,topicDetails",
             id=channel_id)
-        response = request.execute()
-        if not response['items']:  # check if it's empty
+        try:
+            response = request.execute()
+        except HttpError as e:
+            logging.error(e)
+            return
+        if 'items' not in response:  # check if it's empty
             logging.error(f"Can't find channel with id {channel_id}")
             # raise ValueError("Cannot find channel using channel id")
             return
@@ -50,6 +55,15 @@ class YoutubeAPI():
                 result['topic'] = ', '.join([item.split('/')[-1] for item in result['topic']])  # noqa
         return result
 
+    def multiple_channels_stat(self,
+                               channel_list: list[str]) -> list[dict]:
+        results = []
+        for channel_id in channel_list:
+            result = self.get_channel_stat(channel_id)
+            if result:
+                results.append(result)
+        return results
+
     def get_channel_stat(self,
                          channel_id: str) -> dict:
         '''
@@ -66,7 +80,11 @@ class YoutubeAPI():
         request = self.youtube.channels().list(
             part="id, statistics",
             id=channel_id)
-        response = request.execute()
+        try:
+            response = request.execute()
+        except HttpError as e:
+            logging.error(e)
+            return
         if not response['items']:  # check if it's empty
             logging.error(f"Can't find channel with id {channel_id}")
             # raise ValueError("Cannot find channel using channel id")
@@ -95,7 +113,11 @@ class YoutubeAPI():
         request = self.youtube.videos().list(
             part="contentDetails,id,snippet,status,topicDetails",
             id=video_id)
-        response = request.execute()
+        try:
+            response = request.execute()
+        except HttpError as e:
+            logging.error(e)
+            return
         if not response['items']:  # check if it's empty
             logging.error(f"Can't find video with id {video_id}")
             # raise ValueError("Cannot find video using video id")
@@ -114,6 +136,15 @@ class YoutubeAPI():
             result['categoryId'] = info['snippet']['categoryId']
         return result
 
+    def multiple_videos_stat(self,
+                             video_list: list[str]) -> list[dict]:
+        results = []
+        for id in video_list:
+            result = self.get_video_stat(id)
+            if result:
+                results.append(result)
+        return results
+
     def get_video_stat(self,
                        video_id: str) -> dict:
         '''
@@ -129,7 +160,11 @@ class YoutubeAPI():
         request = self.youtube.videos().list(
             part="id, statistics",
             id=video_id)
-        response = request.execute()
+        try:
+            response = request.execute()
+        except HttpError as e:
+            logging.error(e)
+            return
         if not response['items']:  # check if it's empty
             logging.warning(f"Can't find video with id {video_id}")
             # raise ValueError("Cannot find video using video id")

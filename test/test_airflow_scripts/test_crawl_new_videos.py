@@ -37,5 +37,5 @@ class TestDataToDf():
                 'published_timestamp': [timestamp],
                 'published_time': [time],
             }
-        ).set_index('video_id')
+        )
         assert result['channel_id'].equals(expected['channel_id'])
