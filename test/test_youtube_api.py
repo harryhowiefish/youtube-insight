@@ -66,7 +66,8 @@ def test_get_channel_info_success(API_object, youtube_client):
 
 def test_get_channel_info_not_found(API_object, youtube_client):
     # Mock the API response for a non-existent channel
-    youtube_client.channels().list().execute.return_value = {'items': []}
+    youtube_client.channels().list().execute.return_value = {
+        'something_else': 'foo'}
 
     # Call the function with a mock channel ID that does not exist
     channel_info = API_object.get_channel_info('non_existent_channel_id')

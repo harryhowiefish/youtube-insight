@@ -82,6 +82,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 - add status to missing video can't find
 - add tests
 - drop duplicate during crawling (likely fixed, need to write tests to confirm)
+- add fake .env path to test
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
