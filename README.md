@@ -65,8 +65,6 @@ docker compose up -d
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
 ## Working progress
-- extended testing
-- 
 - 30 minute crawl for the first 24 hours
 - 6 hour crawl for the first 7 days
 - 1 day crawl for the 30 days
@@ -76,13 +74,14 @@ use the notebooks in the visualization folder to explore insights into your sele
 - add hive, mongodb integration
 - directly connect postgres to airflow.
 - add file cleanup code for airflow + other airflow optimization
+- add dataclass for data validation during data crawling
 
 ## Issues
 - set video status with time (change db setting)
 - add status to missing video can't find
-- add tests
-- drop duplicate during crawling (likely fixed, need to write tests to confirm)
-- add fake .env path to test
+- up test coverage
+    - add fake .env path to test
+    - remember to test duplicate during crawling (shouldn't happen)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

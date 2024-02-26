@@ -12,14 +12,13 @@ default_args = {
 def status_update():
     from src.core import DB_Connection
     db = DB_Connection()
-    rowcount = db.update(
+    db.update(
         '''
           update video
           set active = False
           where published_date < current_date - interval '30 day'
           and active = True
-          ''')
-    print(f'Number of row updated: {rowcount}')
+        ''')
 
 
 update_video_status = DAG(

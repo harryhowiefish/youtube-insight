@@ -67,12 +67,28 @@ def main():
 
 
 def get_db_status(client, db_name: str) -> str:
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     info = client.describe_db_instances(
         DBInstanceIdentifier=db_name)['DBInstances'][0]
     return info['DBInstanceStatus']
 
 
 def db_polling(client, db_name: str, waiting_for: str) -> None:
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     while True:
         status = get_db_status(client, db_name)
         if status == waiting_for:

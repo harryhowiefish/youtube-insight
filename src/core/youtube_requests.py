@@ -9,19 +9,18 @@ BASIC_HEADER = {"User-Agent": "Mozilla/5.0",
 
 class Channel():
     '''
+    A class to crawl infromation from a youtube channel.
+    Initialize with the channel_id CHAR(24)
     '''
 
     def __init__(self, channel_id: str) -> None:
         self.headers: dict = BASIC_HEADER
         self.yt_api_key: str | None = None
         self.channel_id: str = channel_id
-
-    @property
-    def tabs(self):
-        return self.get_channel_tabs()
+        self.tabs = self.get_channel_tabs()
 
     def get_video_lists(self,
-                        limit: int = 20) -> dict[str, list]:
+                        limit: int = 20) -> dict[str, list | None]:
         '''
         Look for the most recent video posting from a specified channel.
         Both video and shorts page will be query.
@@ -36,7 +35,7 @@ class Channel():
         Does not support youtube channel handles.
 
         limit: int. Default None
-        set the number of video to crawl
+        Set the number of video to crawl.
 
         Returns
         -------
@@ -59,6 +58,21 @@ class Channel():
         return result
 
     def get_channel_tabs(self) -> list[str]:
+        '''
+        Query the channel to see what tabs are avaliable for the channel.
+        "Home" tab is added manual due to differ in class name in HTML
+
+        Parameters
+        ----------
+        None
+
+        Returns:
+        -------
+        tabs list[str]
+
+        list of tabs (likely to include home, videos, shorts,
+        playlists, community)
+        '''
         resp = requests.get(
             f'https://www.youtube.com/channel/{self.channel_id}/',
             headers=self.headers)
@@ -72,23 +86,20 @@ class Channel():
         tabs.insert(0, 'Home')
         return tabs
 
-    def _single_page_video_listing(self, url: str, limit: int
+    def _single_page_video_listing(self, url: str, limit: int = float('inf')
                                    ) -> list:
         '''
         Helper function to crawl the video listing on a single page.
-        If continuation is set, use post method to get the next page.
+        By default, it will crawl all the video listing on that page.
 
         Parameters
         ----------
         url: str
 
-        youtube link to crawl.
-        It can be any page with video link / thumbnails.
+        Youtube link to crawl.
+        It should be the shorts or videos tab for channels.
 
-        continuation: str. Default = None
-        continuation token from the previous loading page.
-
-        limit: int. Default 20
+        limit: int. Default inf
 
         Limit the number of elements to crawl.
         This is set to prevent issue with selenium.
@@ -98,8 +109,6 @@ class Channel():
         id_list: list
 
         List of video ids.
-
-        -------
         '''
         all_vids = []
         resp = requests.get(
@@ -121,6 +130,14 @@ class Channel():
         return all_vids[:limit]
 
     def _continous_video_listing(self, token: str):
+        '''
+
+        Parameters
+        ----------
+
+        Returns:
+        -------
+        '''
         url, headers, data = self._create_innertube_post_data(token)
         resp = requests.post(url, headers=headers, data=data)
         text = resp.text.replace(' ', '').replace('\n', '')
@@ -133,6 +150,14 @@ class Channel():
         return video_ids, next_token
 
     def _create_innertube_post_data(self, token):
+        '''
+
+        Parameters
+        ----------
+
+        Returns:
+        -------
+        '''
         load_more_url = "https://www.youtube.com/youtubei/v1/browse?key=" + \
             f"{self.yt_api_key}"
         headers = {
@@ -154,6 +179,14 @@ class Channel():
         return load_more_url, headers, data
 
     def _raw_html(self, url: str) -> str:
+        '''
+
+        Parameters
+        ----------
+
+        Returns:
+        -------
+        '''
         resp = requests.get(
             url,
             headers=self.headers)

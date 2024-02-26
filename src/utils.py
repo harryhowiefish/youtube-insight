@@ -4,7 +4,19 @@ import logging
 
 
 def load_env(path: str | None) -> None:
+    '''
+    Load env file by path. Default to .ENV file in working directory.
 
+    Parameter
+    ---------
+    path: str
+
+    Path to ENV file.
+
+    Return
+    ---------
+    None
+    '''
     # check if path not provided use default
     if not path:
         path = os.path.join(os.getcwd(), '.ENV')

@@ -47,7 +47,7 @@ def main():
             deactive_channel(channel_id, new_tag=False)
             continue
 
-        video_data = youtube.ids_to_data(video_lists)
+        video_data = youtube.multiple_videos_info(video_lists)
         video_df = data_to_df(video_data, channel_id)
         video_df.to_csv(f'{channel_id}_videos.csv', index=False)
 
@@ -65,6 +65,14 @@ def main():
 
 def scrape_video_by_channel_id(channel_id: str,
                                count: int | None = None) -> dict[str, list]:
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     c = Channel(channel_id)
     if not count:
         video_lists = c.get_video_lists()
@@ -77,6 +85,14 @@ def scrape_video_by_channel_id(channel_id: str,
 
 
 def channel_vids(channel_id: str) -> dict[str, list]:
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     existing_vids = {}
     db = DB_Connection()
     for video_type in ['video', 'short']:
@@ -91,6 +107,14 @@ def channel_vids(channel_id: str) -> dict[str, list]:
 
 
 def filter_videos(new_videos: dict, existing_videos: dict):
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     video_lists = {}
     for key, value in new_videos.items():
         video_lists[key] = []
@@ -101,6 +125,14 @@ def filter_videos(new_videos: dict, existing_videos: dict):
 
 
 def update_channel_status(channel_id):
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     db = DB_Connection()
     update_stmt = """
                   update channel
@@ -119,6 +151,14 @@ def update_channel_status(channel_id):
 
 
 def data_to_df(video_data: list[dict], channel_id: str):
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     # organize into dataframe
     video_df = pd.DataFrame(video_data)
     video_df['channel_id'] = channel_id
@@ -132,6 +172,14 @@ def data_to_df(video_data: list[dict], channel_id: str):
 
 
 def deactive_channel(channel_id: str, new_tag: bool) -> None:
+    '''
+
+    Parameters
+    ----------
+
+    Returns:
+    -------
+    '''
     db = DB_Connection()
     update_stmt = """
     update channel
