@@ -1,8 +1,6 @@
 import sys
 import logging
-import src.get_data as get_data
-import src.db_connection as db_connection
-import src.youtube_crawler as youtube_crawler
+from src.core import DB_Connection, YoutubeAPI, youtube_requests
 
 logging.basicConfig(level=logging.INFO)
 
@@ -11,8 +9,7 @@ def main():
 
     # crawl channel listing on search page using selenium
     keyword = sys.argv[1]
-    crawler = youtube_crawler.Crawler()
-    result = crawler.keyword_search(keyword)
+    result = youtube_requests.keyword_search(keyword)
 
     # result can include more than one channel. Loop through to check.
     idx = 0
@@ -32,11 +29,10 @@ def main():
         return
 
     # get channel information using youtube API
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    result = get_data.get_channel_info(youtube, result[idx][0])
-
+    youtube = YoutubeAPI()
+    result = youtube.get_channel_info(youtube, result[idx][0])
     # adding final result to DB
-    db = db_connection.DB_Connection()
+    db = DB_Connection()
     db.conn_string_from_path('config/secrets.json')
     insert_stmt = f"""
     INSERT INTO channel ({','.join(result.keys())})

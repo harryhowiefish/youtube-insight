@@ -5,7 +5,7 @@ from airflow.operators.bash import BashOperator
 # from airflow_scripts import update_channel_stat
 default_args = {
     'owner': 'Harry',
-    'retries': 2,
+    'retries': 0,
     'retry_delay': timedelta(minutes=1)
 }
 
@@ -19,34 +19,34 @@ pipeline = DAG(
 
 start_task = BashOperator(
         task_id='spin_up_db',
-        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set on',  # noqa
+        bash_command='cd /opt/airflow && python src/airflow_scripts/db_control.py -set on',  # noqa
         dag=pipeline,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 new_video = BashOperator(
     task_id='crawl_new_video',
-    bash_command='cd /opt/airflow && python airflow_scripts/crawl_new_videos.py',  # noqa
+    bash_command='cd /opt/airflow && python src/airflow_scripts/crawl_new_videos.py',  # noqa
     dag=pipeline
 )
 
 update_channel = BashOperator(
     task_id='refresh_channel_stat',
-    bash_command='cd /opt/airflow && python airflow_scripts/update_channel_stat.py',  # noqa
+    bash_command='cd /opt/airflow && python src/airflow_scripts/update_channel_stat.py',  # noqa
     dag=pipeline
 )
 
 update_video = BashOperator(
     task_id='refresh_video_stat',
-    bash_command='cd /opt/airflow && python airflow_scripts/update_video_stat.py',  # noqa
+    bash_command='cd /opt/airflow && python src/airflow_scripts/update_video_stat.py',  # noqa
     dag=pipeline
 )
 
 end_task = BashOperator(
         task_id='initiate_shutdown',
-        bash_command='cd /opt/airflow && python airflow_scripts/db_control.py -set off',  # noqa
+        bash_command='cd /opt/airflow && python src/airflow_scripts/db_control.py -set off',  # noqa
         dag=pipeline,
-        execution_timeout=timedelta(minutes=15)
+        execution_timeout=timedelta(minutes=20)
     )
 
 start_task >> new_video

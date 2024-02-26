@@ -1,7 +1,7 @@
 import sys
 import logging
 import pandas as pd
-from src import get_data, db_connection
+from src.core import DB_Connection, YoutubeAPI
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,14 +13,13 @@ def main():
     with open(path) as f:
         txt = f.read()
     channels = txt.replace(' ', '').split(',')
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
+    youtube = YoutubeAPI()
+    db = DB_Connection()
 
     # get channel information using youtube API
     channel_info = []
     for channel in channels:
-        channel_info.append(get_data.get_channel_info(youtube, channel))
+        channel_info.append(youtube.get_channel_info(channel))
     channel_df = pd.DataFrame(channel_info)
 
     # adding final result to DB

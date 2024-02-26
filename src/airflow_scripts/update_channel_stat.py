@@ -1,5 +1,4 @@
-import src.get_data as get_data
-import src.db_connection as db_connection
+from src.core import YoutubeAPI, DB_Connection
 import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -10,14 +9,13 @@ def main():
     This scripts uses youtube API to query the latest stats
     for the channels with active status in database.
     '''
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
+    youtube = YoutubeAPI()
+    db = DB_Connection()
     result = db.query('SELECT channel_id FROM channel WHERE active=True')
     channel_ids = [item[0] for item in result]
     results = []
     for id in channel_ids:
-        result = get_data.get_channel_stat(youtube, id)
+        result = youtube.get_channel_stat(id)
         if result:
             results.append(result)
     stat_df = pd.DataFrame(results)

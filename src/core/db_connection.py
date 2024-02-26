@@ -1,19 +1,24 @@
-import json
 import psycopg2
 from psycopg2.extras import execute_batch
 import logging
 from contextlib import contextmanager
 import pandas as pd
+from src import utils
+import os
 
 
 class DB_Connection():
     '''
     Include methods to help with DB manipulation.
     '''
-    def __init__(self):
+
+    def __init__(self, env_path: str | None = None
+                 ) -> None:
+        self.conn_string = self._conn_string_from_env(env_path)
         pass
 
-    def conn_string_from_path(self, path: str) -> None:
+    def _conn_string_from_env(self,
+                              path: str | None) -> None:
         '''
 
         Parameters
@@ -27,15 +32,13 @@ class DB_Connection():
         -------
         None
         '''
-        with open(path) as f:
-            config = json.load(f)
+        utils.load_env(path)
+        HOST = os.environ['pg_host']
+        USER = os.environ['pg_user']
+        DBNAME = os.environ['pg_dbname']
+        PASSWORD = os.environ['pg_password']
 
-        HOST = config['postgres']['host']
-        USER = config['postgres']['user']
-        DBNAME = config['postgres']['dbname']
-        PASSWORD = config['postgres']['password']
-
-        self.conn_string = f"host={HOST} user={USER} " + \
+        return f"host={HOST} user={USER} " + \
             f"dbname={DBNAME} password={PASSWORD} sslmode=allow"
 
     @contextmanager

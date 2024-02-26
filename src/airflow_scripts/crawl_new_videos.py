@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import isodate
-from src import get_data, db_connection, youtube_crawler
+from src.core import YoutubeAPI, DB_Connection, Channel
 logging.basicConfig(level=logging.INFO)
 
 
@@ -21,14 +21,12 @@ def main():
     '''
 
     # setup connections (youtube API, db and crawler)
-    youtube = get_data.start_youtube_connection('config/secrets.json')
-    db = db_connection.DB_Connection()
-    db.conn_string_from_path('config/secrets.json')
-    crawler = youtube_crawler.Crawler()
+    youtube = YoutubeAPI()
+    db = DB_Connection()
 
     # set all channels as active
     # (Future work: this should be moved to a separate task in DAG)
-    db.update('UPDATE channel SET active=True')
+    # db.update('UPDATE channel SET active=True')
 
     # get the channel ids from db
     result = db.query('SELECT channel_id FROM channel where active=True')
@@ -36,31 +34,14 @@ def main():
 
     for channel_id in channel_ids:
         # use crawler the get video
-        v_ids = crawler.get_video_lists(channel_id)
-        video_data = []
-
-        # loop through crawled data to call youtube API
-        for video_type, video_ids in v_ids.items():
-            if not video_ids:  # if there's no video crawled
-                continue
-            for video_id in video_ids:
-                single_video = {'video_type': video_type}
-                single_video.update(get_data.get_video_info(youtube, video_id))
-                video_data.append(single_video)
-        if not video_data:  # if there's no video crawled
+        c = Channel(channel_id)
+        video_lists = c.get_video_lists()
+        if not video_lists or all([not item for item in video_lists.values()]):
             logging.info(f'{channel_id} has no video to updated.')
             continue
+        video_data = youtube.ids_to_data(video_lists)
+        video_df = data_to_df(video_data, channel_id)
 
-        # organize into dataframe
-        video_df = pd.DataFrame(video_data)
-        video_df['channel_id'] = channel_id
-        video_df['published_timestamp'] = pd.to_datetime(video_df['published_date']).dt.tz_convert(tz='Asia/Shanghai')  # noqa
-        video_df['published_time'] = video_df['published_timestamp'].dt.timetz
-        video_df['published_date'] = video_df['published_timestamp'].dt.date
-        video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
-        video_df = video_df.set_index('video_id')
-
-        #
         new_df_list = []
         for video_type in ['video', 'short']:
             query_stmt = f"""
@@ -79,7 +60,7 @@ def main():
             if existing_v_ids:
                 new_df_list.append(
                     video_df[(video_df['published_timestamp'] >
-                              video_df.at[existing_v_ids[0],'published_timestamp']) &  # noqa
+                              video_df.at[existing_v_ids[0], 'published_timestamp']) &  # noqa
                              (video_df['video_type'] == video_type)])
             else:
                 new_df_list.append(video_df[video_df['video_type'] == video_type])  # noqa
@@ -89,11 +70,12 @@ def main():
                                                      axis=1)
         new_vids_df.drop_duplicates(subset='video_id', inplace=True)
 
-        insert_stmt = f"""
-        INSERT INTO video ({','.join(new_vids_df.columns)})
-        VALUES ({','.join(['%s']*new_vids_df.shape[1])})
-        """
-        db.insert_df(insert_stmt, new_vids_df)
+        if len(new_vids_df) > 0:
+            insert_stmt = f"""
+            INSERT INTO video ({','.join(new_vids_df.columns)})
+            VALUES ({','.join(['%s']*new_vids_df.shape[1])})
+            """
+            db.insert_df(insert_stmt, new_vids_df)
 
         update_stmt = """
         update channel
@@ -108,6 +90,18 @@ def main():
                 logging.info(f'{channel_id} video updated')
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
+
+
+def data_to_df(video_data: list[dict], channel_id: str):
+    # organize into dataframe
+    video_df = pd.DataFrame(video_data)
+    video_df['channel_id'] = channel_id
+    video_df['published_timestamp'] = pd.to_datetime(video_df['published_date']).dt.tz_convert(tz='Asia/Taipei')  # noqa
+    video_df['published_time'] = video_df['published_timestamp'].dt.timetz
+    video_df['published_date'] = video_df['published_timestamp'].dt.date
+    video_df['duration'] = video_df['duration'].apply(isodate.parse_duration)  # noqa
+    video_df.set_index('video_id', inplace=True)
+    return video_df
 
 
 if __name__ == '__main__':
