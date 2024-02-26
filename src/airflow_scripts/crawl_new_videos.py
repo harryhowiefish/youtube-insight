@@ -63,15 +63,30 @@ def main():
                  f'Total of {total_vids} videos were added.')
 
 
-def scrape_video_by_channel_id(channel_id: str,
-                               count: int | None = None) -> dict[str, list]:
+def scrape_video_by_channel_id(channel_id: str, count: int | None = None
+                               ) -> dict[str, list] | None:
     '''
+    Get video listing on the channel.
+    Added validation to check if videos exist.
 
     Parameters
     ----------
+    channel_id : str
+
+    Youtube channel id CHAR(24)
+
+    count: int. Default to None
+
+    Target number of videos per page.
+    By default, it will use the default value in Channel.get_video_lists()
 
     Returns:
     -------
+    video_lists : dict
+
+    Dictionary containing "videos" and/or "shorts" key.
+    Each contain a list of video ids.
+    If no video scraped, return None.
     '''
     c = Channel(channel_id)
     if not count:
@@ -86,12 +101,21 @@ def scrape_video_by_channel_id(channel_id: str,
 
 def channel_vids(channel_id: str) -> dict[str, list]:
     '''
+    Query the database to get the videos from a specific channel id.
 
     Parameters
     ----------
+    channel_id : str
+
+    Youtube channel id CHAR(24)
 
     Returns:
     -------
+    existing_vids : dict
+
+    List of videos in the database
+    Seperated into video and/or short keys.
+
     '''
     existing_vids = {}
     db = DB_Connection()
@@ -106,58 +130,57 @@ def channel_vids(channel_id: str) -> dict[str, list]:
     return existing_vids
 
 
-def filter_videos(new_videos: dict, existing_videos: dict):
+def filter_videos(new_videos: dict[str, list],
+                  existing_videos: dict[str, list]
+                  ) -> dict[str, list]:
     '''
+    Check new video against the videos already in DB.
+    This is used to save API quota.
 
     Parameters
     ----------
+    new_videos: dict
+
+    List of videos crawled in current session.
+    Seperated into video and/or short keys.
+
+    existing_videos: dict
+
+    List of videos in the database
+    Seperated into video and/or short keys.
 
     Returns:
     -------
+    filtered_lists : dict
+    List of videos with only the new video ids.
+    Seperated into video and/or short keys.
+
     '''
-    video_lists = {}
+    filtered_lists = {}
     for key, value in new_videos.items():
-        video_lists[key] = []
+        filtered_lists[key] = []
         for id in value:
             if id not in existing_videos[key]:
-                video_lists[key].append(id)
-    return video_lists
+                filtered_lists[key].append(id)
+    return filtered_lists
 
 
-def update_channel_status(channel_id):
+def data_to_df(video_data: list[dict], channel_id: str) -> pd.DataFrame:
     '''
+    Transform data list in to dataframe.
+    This step prepares the data to be loaded into the database.
 
     Parameters
     ----------
+    video_data : list[dict]
+
+    List of video data (video info).
 
     Returns:
     -------
-    '''
-    db = DB_Connection()
-    update_stmt = """
-                  update channel
-                  set active = false
-                  where channel_id = %s
-                  """
-    with db._start_cursor() as cur:
-        try:
-            # Execute the INSERT statement for each row in the DataFrame
-            cur.execute(update_stmt, (channel_id,))
-            # Commit the transaction
-            logging.info(f'{channel_id} video updated')
-        except Exception as e:
-            logging.error(f"An error occurred here: {e}")
-    return
-
-
-def data_to_df(video_data: list[dict], channel_id: str):
-    '''
-
-    Parameters
-    ----------
-
-    Returns:
-    -------
+    video_df : pd.DataFrame
+    columns include channel_id, published_time,
+    published_date, duration
     '''
     # organize into dataframe
     video_df = pd.DataFrame(video_data)
@@ -173,11 +196,18 @@ def data_to_df(video_data: list[dict], channel_id: str):
 
 def deactive_channel(channel_id: str, new_tag: bool) -> None:
     '''
-
+    Update channel status in database to false.
     Parameters
     ----------
+    channel_id : str
+
+    Youtube channel id CHAR(24)
+
+    new_tag : bool
+    True if video were added (only for logging purposes)
 
     Returns:
+    None
     -------
     '''
     db = DB_Connection()

@@ -1,3 +1,8 @@
+'''
+Includes the Channel class that to parse HTML result for
+information from youtube channel pages.
+
+'''
 import re
 import requests
 import json
@@ -129,14 +134,29 @@ class Channel():
         logging.info(f'Recieved {min(len(all_vids),limit)} video from {url}')
         return all_vids[:limit]
 
-    def _continous_video_listing(self, token: str):
+    def _continous_video_listing(self, token: str) -> tuple[list[str], str]:
         '''
+        Helper function to get the video listing on the next page.
+        This is needed if number of video crawled exceeds the preload amount.
 
         Parameters
         ----------
 
+        token : str
+        Continuation token from the previous page.
+        Used to query new videos using innertube post request.
+
+
         Returns:
         -------
+        video_ids : list[str]
+        list of video_ids on the current page/token.
+
+        next_token : str
+
+        Token for the next set of videos.
+        An empty string will be return in no more video to load.
+
         '''
         url, headers, data = self._create_innertube_post_data(token)
         resp = requests.post(url, headers=headers, data=data)
@@ -149,14 +169,31 @@ class Channel():
             return video_ids, ''
         return video_ids, next_token
 
-    def _create_innertube_post_data(self, token):
+    def _create_innertube_post_data(self, token: str
+                                    ) -> tuple[str, dict[str, str], str]:
         '''
+        Helper function to create the required object
+        for innertube's post request.
 
         Parameters
         ----------
+        token: str
+        Continuation token from the previous page.
 
         Returns:
         -------
+        load_more_url : str
+
+        Url used for post request to innertube (youtubei)
+
+        headers : dict
+
+        extended header from self.headers to meet innertube
+        requirements.
+
+        data : str
+
+        Serialized data in json format.
         '''
         load_more_url = "https://www.youtube.com/youtubei/v1/browse?key=" + \
             f"{self.yt_api_key}"
@@ -180,12 +217,19 @@ class Channel():
 
     def _raw_html(self, url: str) -> str:
         '''
+        Helper function to return the HTML of the url.
+        Only used for debug / developing purpose.
 
         Parameters
         ----------
 
+        url : str
+
         Returns:
         -------
+        text : str
+
+        raw html text
         '''
         resp = requests.get(
             url,
@@ -196,7 +240,7 @@ class Channel():
 def keyword_search(keyword: str) -> list:
     '''
     Search for youtube channel id using keyword via youtube search.
-    Matches are ordered base on the result given on the search page.
+    Matches' order are based on the result given on the search page.
     Result can be None if no channel is suggested by youtube.
 
     Parameters

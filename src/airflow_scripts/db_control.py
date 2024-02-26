@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 def main():
     '''
     This script creates a faster way to switch on/off AWS RDS.
-    AWS credential is required for this to work.
+    .aws in root directory is required for this to work.
     '''
 
     # Parser setting
@@ -68,12 +68,21 @@ def main():
 
 def get_db_status(client, db_name: str) -> str:
     '''
+    Parse status from describe_db_instances method's result.
 
     Parameters
     ----------
+    client: boto3.client.RDS
+
+    RDS client
+
+    db_name : str
+
+    DB name on AWS
 
     Returns:
     -------
+    status : str
     '''
     info = client.describe_db_instances(
         DBInstanceIdentifier=db_name)['DBInstances'][0]
@@ -82,12 +91,25 @@ def get_db_status(client, db_name: str) -> str:
 
 def db_polling(client, db_name: str, waiting_for: str) -> None:
     '''
+    Continously check in on status until change complete.
 
     Parameters
     ----------
+    client: boto3.client.RDS
+
+    RDS client
+
+    db_name : str
+
+    DB name on AWS
+
+    waiting_for : str
+
+    The status you expect to recieve.
 
     Returns:
     -------
+    None
     '''
     while True:
         status = get_db_status(client, db_name)
