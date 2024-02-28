@@ -44,7 +44,7 @@ sql_update = PythonOperator(
 
 end_task = BashOperator(
         task_id='initiate_shutdown',
-        bash_command='cd /opt/airflow && src/python src/airflow_scripts/db_control.py -set off',  # noqa
+        bash_command='cd /opt/airflow && python src/airflow_scripts/db_control.py -set off',  # noqa
         dag=update_video_status,
         execution_timeout=timedelta(minutes=20)
     )

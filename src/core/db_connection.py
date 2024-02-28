@@ -25,7 +25,7 @@ class DB_Connection():
         pass
 
     def _conn_string_from_env(self,
-                              path: str | None) -> None:
+                              path: str | None = None) -> str:
         '''
         Create conn_string from env file.
 
@@ -117,7 +117,7 @@ class DB_Connection():
                 # Execute the INSERT statement for each row in the DataFrame
                 cur.execute(insert_stmt, data)
                 # Commit the transaction
-                logging.info('insert transaction complete')
+                logging.info('Insert transaction completed.')
                 return cur.rowcount
             except Exception as e:
                 logging.error(f"An error occurred here: {e}")
@@ -152,7 +152,7 @@ class DB_Connection():
                 logging.error(f"An error occurred here: {e}")
                 return
 
-    def update(self, query_stmt: str) -> int | None:
+    def update(self, update_stmt: str) -> int | None:
         '''
         For SQL UPDATE statments
 
@@ -171,7 +171,7 @@ class DB_Connection():
         with self._start_cursor() as cur:
             try:
                 # Execute the INSERT statement for each row in the DataFrame
-                cur.execute(query_stmt)
+                cur.execute(update_stmt)
                 logging.info(f'Number of row updated: {cur.rowcount}')
                 return cur.rowcount
             except Exception as e:

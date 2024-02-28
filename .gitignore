@@ -158,3 +158,4 @@ testing.ipynb
 .vscode
 logs/*
 config/airflow.cfg
+!test/test_data/.ENV
