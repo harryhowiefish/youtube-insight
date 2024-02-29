@@ -123,7 +123,7 @@ class YoutubeAPI():
         except HttpError as e:
             logging.error(e)
             return
-        if not response['items']:  # check if it's empty
+        if 'items' not in response:  # check if it's empty
             logging.error(f"Can't find channel with id {channel_id}")
             # raise ValueError("Cannot find channel using channel id")
             return
@@ -159,8 +159,10 @@ class YoutubeAPI():
                 continue
             for video_id in video_ids:
                 single_video = {'video_type': video_type}
-                single_video.update(self.get_video_info(video_id))
-                video_data.append(single_video)
+                info = self.get_video_info(video_id)
+                if info:
+                    single_video.update(info)
+                    video_data.append(single_video)
         return video_data
 
     def get_video_info(self,
@@ -271,7 +273,7 @@ class YoutubeAPI():
             result['comment_count'] = info['statistics']['commentCount']
         return result
 
-    def _api_key_from_env(self, path: str | None
+    def _api_key_from_env(self, path: str | None = None
                           ) -> googleapiclient.discovery.Resource:
         '''
         helper function to get API key from .env

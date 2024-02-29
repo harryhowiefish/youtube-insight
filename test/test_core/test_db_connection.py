@@ -52,20 +52,21 @@ class MockConnection:
 def set_env(monkeypatch):
     mock_path = 'test/test_data/'
     monkeypatch.setattr('os.getcwd', lambda: mock_path)
-
-
-def create_connection(monkeypatch):
     monkeypatch.setattr("psycopg2.connect",
                         lambda dsn: MockConnection(dsn))
+
+
+@pytest.fixture
+def db_conn():
     db_conn = DB_Connection()
-    return db_conn
+    yield db_conn
+    del db_conn
 
 
 class TestSetupAndContextManager():
 
     @staticmethod
-    def test_init():
-        db_conn = DB_Connection()
+    def test_init(db_conn):
         isinstance(db_conn, DB_Connection)
 
     @staticmethod
@@ -78,8 +79,7 @@ class TestSetupAndContextManager():
         assert expected == result
 
     @staticmethod
-    def test_start_cursor(monkeypatch):
-        db_conn = create_connection(monkeypatch)
+    def test_start_cursor(db_conn):
         with db_conn._start_cursor() as cursor:
             assert cursor == MockConnection.MockCursor
 
@@ -87,9 +87,8 @@ class TestSetupAndContextManager():
 class TestTwoInsertMethods():
 
     @staticmethod
-    def test_insert_df(monkeypatch, caplog):
+    def test_insert_df(db_conn, caplog):
         caplog.clear()
-        db_conn = create_connection(monkeypatch)
         data = {'col1': [1, 2], 'col2': [3, 4]}
         df = pd.DataFrame(data)
         with caplog.at_level(logging.INFO):
@@ -98,9 +97,8 @@ class TestTwoInsertMethods():
         assert expected_log in caplog.text
 
     @staticmethod
-    def test_insert_one(monkeypatch, caplog):
+    def test_insert_one(db_conn, caplog):
         caplog.clear()
-        db_conn = create_connection(monkeypatch)
         data = ['item1', 'item2']
         with caplog.at_level(logging.INFO):
             result = db_conn.insert_one('insert_stmt', data)
@@ -111,14 +109,12 @@ class TestTwoInsertMethods():
 class TestQueryAndUpdate():
 
     @staticmethod
-    def test_query(monkeypatch):
-        db_conn = create_connection(monkeypatch)
+    def test_query(db_conn):
         result = db_conn.query('query_stmt')
         assert result == ['item1', 'item2']
 
     @staticmethod
-    def test_update(monkeypatch):
-        db_conn = create_connection(monkeypatch)
+    def test_update(db_conn):
         result = db_conn.update('update_stmt')
         assert result is None
 
@@ -126,8 +122,7 @@ class TestQueryAndUpdate():
 class TestExportCsv():
 
     @staticmethod
-    def test_file_exist(monkeypatch, tmp_path):
-        db_conn = create_connection(monkeypatch)
+    def test_file_exist(db_conn, tmp_path):
         path = tmp_path / 'test.csv'
         db_conn.export_csv('stmt', path)
         assert os.path.exists(path)

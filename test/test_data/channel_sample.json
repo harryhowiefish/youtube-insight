@@ -1,0 +1,72 @@
+{
+    "kind": "youtube#channelListResponse",
+    "etag": "RXlBURbC8dkjcbd6cqh7WksIKJg",
+    "pageInfo": {
+        "totalResults": 1,
+        "resultsPerPage": 5
+    },
+    "items": [
+        {
+            "kind": "youtube#channel",
+            "etag": "Yo5KoyBW0wm_UiVHdZm7vC1sdFI",
+            "id": "UCdEpz2A4DzV__4C1x2quKLw",
+            "snippet": {
+                "title": "PAPAYA 電腦教室",
+                "description": "PAPAYA 希望以最淺白易懂的方式，讓大家能夠輕鬆上手常用的電腦軟體。",
+                "customUrl": "@papayaclass",
+                "publishedAt": "2008-11-09T03:54:16Z",
+                "thumbnails": {
+                    "default": {
+                        "url": "https://yt3.ggpht.com/ytc/AIdro_m3nf14bpEjVkXq0hNJOp2UrcdcjnfeU97VktoAxg=s88-c-k-c0x00ffffff-no-rj",
+                        "width": 88,
+                        "height": 88
+                    },
+                    "medium": {
+                        "url": "https://yt3.ggpht.com/ytc/AIdro_m3nf14bpEjVkXq0hNJOp2UrcdcjnfeU97VktoAxg=s240-c-k-c0x00ffffff-no-rj",
+                        "width": 240,
+                        "height": 240
+                    },
+                    "high": {
+                        "url": "https://yt3.ggpht.com/ytc/AIdro_m3nf14bpEjVkXq0hNJOp2UrcdcjnfeU97VktoAxg=s800-c-k-c0x00ffffff-no-rj",
+                        "width": 800,
+                        "height": 800
+                    }
+                },
+                "localized": {
+                    "title": "PAPAYA 電腦教室",
+                    "description": "PAPAYA 希望以最淺白易懂的方式，讓大家能夠輕鬆上手常用的電腦軟體。"
+                },
+                "country": "TW"
+            },
+            "statistics": {
+                "viewCount": "115815042",
+                "subscriberCount": "1420000",
+                "hiddenSubscriberCount": false,
+                "videoCount": "494"
+            },
+            "topicDetails": {
+                "topicIds": [
+                    "/m/07c1v",
+                    "/m/01k8wb",
+                    "/m/019_rr"
+                ],
+                "topicCategories": [
+                    "https://en.wikipedia.org/wiki/Technology",
+                    "https://en.wikipedia.org/wiki/Knowledge",
+                    "https://en.wikipedia.org/wiki/Lifestyle_(sociology)"
+                ]
+            },
+            "brandingSettings": {
+                "channel": {
+                    "title": "PAPAYA 電腦教室",
+                    "description": "PAPAYA 希望以最淺白易懂的方式，讓大家能夠輕鬆上手常用的電腦軟體。",
+                    "keywords": "電腦 教學 3dsMax 威力導演 \"Premiere Pro\" Word Excel PowerPoint Photoshop 軟體 Illustrator Adobe Microsoft 辦公室 軟件 \"After Effects\" Mac Office Papaya",
+                    "country": "TW"
+                },
+                "image": {
+                    "bannerExternalUrl": "https://yt3.googleusercontent.com/dF7SV7DwwkHMJxxIRzz4DGrt1hCuvUtAs1JwKh3-1xjvKoVo1qegOrWFo0UFIrvB57zfrr_5EQ"
+                }
+            }
+        }
+    ]
+}
