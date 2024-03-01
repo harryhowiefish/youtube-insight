@@ -2,7 +2,7 @@ import sys
 import os
 import logging
 import pandas as pd
-from src.core import DB_Connection, YoutubeAPI
+from src.core import youtube_api, db_connection
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,8 +15,10 @@ def main():
     path = sys.argv[1]
     if path[-4:] != '.txt':
         logging.error('Please provide file that ends with .txt')
-    if not os.path.exists(os.path.join(os.curdir, path)):
+        return
+    elif not os.path.exists(os.path.join(os.curdir, path)):
         logging.error(f'File {path} does not exist.')
+        return
 
     # load text to list
     with open(path) as f:
@@ -24,8 +26,8 @@ def main():
     channels = txt.replace(' ', '').split(',')
 
     # create connections
-    youtube = YoutubeAPI()
-    db = DB_Connection()
+    youtube = youtube_api.YoutubeAPI()
+    db = db_connection.DB_Connection()
 
     # get channel information using youtube API
     channel_info = []
@@ -34,7 +36,7 @@ def main():
         if data:
             channel_info.append(data)
     if not channel_info:
-        logging.warning('No valid channel_id provided')
+        logging.warning('No valid channel_id provided.')
         return
     channel_df = pd.DataFrame(channel_info)
 

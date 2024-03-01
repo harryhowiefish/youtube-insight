@@ -66,7 +66,8 @@ def db_conn():
 class TestSetupAndContextManager():
 
     @staticmethod
-    def test_init(db_conn):
+    def test_init():
+        db_conn = DB_Connection()
         isinstance(db_conn, DB_Connection)
 
     @staticmethod
