@@ -22,45 +22,10 @@ class Channel():
         self.headers: dict = BASIC_HEADER
         self.yt_api_key: str | None = None
         self.channel_id: str = channel_id
-        self.tabs = self.get_channel_tabs()
 
-    def get_video_lists(self,
-                        limit: int = 20) -> dict[str, list | None]:
-        '''
-        Look for the most recent video posting from a specified channel.
-        Both video and shorts page will be query.
-        An empty dictionary will be return in the rare case the channel
-        has no video listing on the two pages.
-
-        Parameters
-        ----------
-        channel_id: str
-
-        Youtube channel_id (CHAR 24).
-        Does not support youtube channel handles.
-
-        limit: int. Default None
-        Set the number of video to crawl.
-
-        Returns
-        -------
-        video_listing: dict
-
-        Dictionary containing "videos" and/or "shorts" key.
-        Each contain a list of video ids.
-        '''
-        result = {}
-        tabs = ""
-
-        tabs = self.get_channel_tabs()
-
-        if 'Videos' in tabs:
-            url = f'https://www.youtube.com/channel/{self.channel_id}/videos'
-            result['video'] = self._single_page_video_listing(url, limit)
-        if 'Shorts' in tabs:
-            url = f'https://www.youtube.com/channel/{self.channel_id}/shorts'
-            result['short'] = self._single_page_video_listing(url, limit)
-        return result
+    @property
+    def tabs(self):
+        return self.get_channel_tabs()
 
     def get_channel_tabs(self) -> list[str]:
         '''
@@ -90,6 +55,41 @@ class Channel():
         tabs = [item['title'] for item in tabs]
         tabs.insert(0, 'Home')
         return tabs
+
+    def get_video_lists(self,
+                        limit: int = 20) -> dict[str, list | None]:
+        '''
+        Look for the most recent video posting from a specified channel.
+        Both video and shorts page will be query.
+        An empty dictionary will be return in the rare case the channel
+        has no video listing on the two pages.
+
+        Parameters
+        ----------
+        channel_id: str
+
+        Youtube channel_id (CHAR 24).
+        Does not support youtube channel handles.
+
+        limit: int. Default None
+        Set the number of video to crawl.
+
+        Returns
+        -------
+        video_listing: dict
+
+        Dictionary containing "videos" and/or "shorts" key.
+        Each contain a list of video ids.
+        '''
+        result = {}
+
+        if 'Videos' in self.tabs:
+            url = f'https://www.youtube.com/channel/{self.channel_id}/videos'
+            result['video'] = self._single_page_video_listing(url, limit)
+        if 'Shorts' in self.tabs:
+            url = f'https://www.youtube.com/channel/{self.channel_id}/shorts'
+            result['short'] = self._single_page_video_listing(url, limit)
+        return result
 
     def _single_page_video_listing(self, url: str, limit: int = float('inf')
                                    ) -> list:
@@ -121,10 +121,14 @@ class Channel():
             headers=self.headers)
         video_ids = re.findall(
             'Endpoint":{"videoId":"(.*?)",', resp.text)
-
-        token = re.findall('"continuationCommand":{"token":"(.*?)",',
-                           resp.text)[0]
         all_vids.extend(video_ids)
+        try:
+            token = re.findall('"continuationCommand":{"token":"(.*?)",',
+                               resp.text)[0]
+        except IndexError:
+            logging.warning(f'Missing continuation in {url}')
+            return all_vids[:min(len(all_vids), limit)]
+
         while len(all_vids) < limit:
             video_ids, token = self._continous_video_listing(token)
             all_vids.extend(video_ids)
@@ -132,7 +136,7 @@ class Channel():
                 break
 
         logging.info(f'Recieved {min(len(all_vids),limit)} video from {url}')
-        return all_vids[:limit]
+        return all_vids[:min(len(all_vids), limit)]
 
     def _continous_video_listing(self, token: str) -> tuple[list[str], str]:
         '''
