@@ -50,6 +50,8 @@ def test_no_channel_id(monkeypatch, tmp_path, caplog):
     monkeypatch.setattr('sys.argv', ['filename', file_path])
     monkeypatch.setattr('src.core.youtube_api.YoutubeAPI',
                         lambda: Mock_Youtube())
+    monkeypatch.setattr(
+        'src.core.db_connection.DB_Connection', lambda: Mock_DB())
     by_file.main()
     assert 'No valid channel_id provided.' in caplog.text
 
