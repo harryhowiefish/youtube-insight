@@ -127,25 +127,6 @@ class TestMain():
         assert "DB already running" == caplog.records[0].msg
 
     @staticmethod
-    def test_arg_set_on_status_on(monkeypatch, caplog):
-
-        caplog.clear()
-        caplog.set_level(level='INFO')
-        status_values = ['available']
-
-        def mock_get_db_status(client, db_name):
-            return status_values.pop(0)
-
-        monkeypatch.setattr(db_control, 'get_db_status', mock_get_db_status)
-        monkeypatch.setattr(db_control, 'parse_args',
-                            lambda: Namespace(**{
-                                'set_status': 'on',
-                                'check_status': False
-                            }))
-        db_control.main()
-        assert "DB already running" == caplog.records[0].msg
-
-    @staticmethod
     def test_arg_set_on_bad_status(monkeypatch, caplog):
 
         caplog.clear()
