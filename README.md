@@ -78,8 +78,8 @@ use the notebooks in the visualization folder to explore insights into your sele
 - add dataclass for data validation during data crawling
 
 ## Issues
-- set video status with time (change db setting)
-- add status to missing video can't find
+1. set video status with time (change db setting)
+2. add status to missing video can't find
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
