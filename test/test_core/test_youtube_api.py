@@ -35,7 +35,7 @@ class Mock_request:
         self.type = type
 
     def execute(self):
-        pass
+        return
 
     def execute_success(self):
         if self.type == 'channel':

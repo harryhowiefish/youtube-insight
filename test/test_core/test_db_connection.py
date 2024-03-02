@@ -53,7 +53,7 @@ def set_env(monkeypatch):
     mock_path = 'test/test_data/'
     monkeypatch.setattr('os.getcwd', lambda: mock_path)
     monkeypatch.setattr("psycopg2.connect",
-                        lambda dsn: MockConnection(dsn))
+                        lambda dsn, connect_timeout: MockConnection(dsn))
 
 
 @pytest.fixture

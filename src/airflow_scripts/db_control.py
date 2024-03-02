@@ -11,15 +11,7 @@ def main():
     This script creates a faster way to switch on/off AWS RDS.
     .aws in root directory is required for this to work.
     '''
-
-    # Parser setting
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-set', '--set_status', help='turn db on or off',
-                        choices=['on', 'off'])
-    parser.add_argument('-check', '--check_status',
-                        help='return db current status',
-                        action='store_true')
-    args = parser.parse_args()
+    args = parse_args()
 
     # AWS connection setup
     os.environ['AWS_PROFILE'] = "boto3"
@@ -87,6 +79,16 @@ def get_db_status(client, db_name: str) -> str:
     info = client.describe_db_instances(
         DBInstanceIdentifier=db_name)['DBInstances'][0]
     return info['DBInstanceStatus']
+
+
+def parse_args(args=None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-set', '--set_status', help='turn db on or off',
+                        choices=['on', 'off'])
+    parser.add_argument('-check', '--check_status',
+                        help='return db current status',
+                        action='store_true')
+    return parser.parse_args(args)
 
 
 def db_polling(client, db_name: str, waiting_for: str) -> None:

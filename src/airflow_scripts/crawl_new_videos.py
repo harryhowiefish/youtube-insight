@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import isodate
-from src.core import YoutubeAPI, DB_Connection, Channel
+from src.core import youtube_api, db_connection, youtube_requests
 logging.basicConfig(level=logging.INFO)
 
 
@@ -20,8 +20,8 @@ def main():
     '''
 
     # setup connections (youtube API, db and crawler)
-    youtube = YoutubeAPI()
-    db = DB_Connection()
+    youtube = youtube_api.YoutubeAPI()
+    db = db_connection.DB_Connection()
 
     # set all channels as active
     # TODO this is only temporarily used to catch errors
@@ -88,7 +88,7 @@ def scrape_video_by_channel_id(channel_id: str, count: int | None = None
     Each contain a list of video ids.
     If no video scraped, return None.
     '''
-    c = Channel(channel_id)
+    c = youtube_requests.Channel(channel_id)
     if not count:
         video_lists = c.get_video_lists()
     else:
@@ -118,7 +118,7 @@ def channel_vids(channel_id: str) -> dict[str, list]:
 
     '''
     existing_vids = {}
-    db = DB_Connection()
+    db = db_connection.DB_Connection()
     for video_type in ['video', 'short']:
         query_stmt = f"""
             select video_id
@@ -210,23 +210,18 @@ def deactive_channel(channel_id: str, new_tag: bool) -> None:
     None
     -------
     '''
-    db = DB_Connection()
+    db = db_connection.DB_Connection()
     update_stmt = """
     update channel
     set active = false
     where channel_id = %s
     """
-    with db._start_cursor() as cur:
-        try:
-            # Execute the INSERT statement for each row in the DataFrame
-            cur.execute(update_stmt, (channel_id,))
-            # Commit the transaction
-            if new_tag:
-                logging.info(f'{channel_id} video updated')
-            else:
-                logging.info(f"{channel_id} has no video to update")
-        except Exception as e:
-            logging.error(f"An error occurred here: {e}")
+    db.update(update_stmt, (channel_id,))
+    if new_tag:
+        logging.info(f'{channel_id} video updated')
+    else:
+        logging.info(f"{channel_id} has no video to update")
+    return
 
 
 if __name__ == '__main__':

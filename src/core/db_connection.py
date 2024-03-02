@@ -57,7 +57,7 @@ class DB_Connection():
         Create a contextmanager for db connection to shuts down after use.
         Autocommit sql transaction.
         '''
-        conn = psycopg2.connect(self.conn_string)
+        conn = psycopg2.connect(self.conn_string, connect_timeout=30)
         cur = conn.cursor()
         try:
             yield cur
@@ -152,7 +152,9 @@ class DB_Connection():
                 logging.error(f"An error occurred here: {e}")
                 return
 
-    def update(self, update_stmt: str) -> int | None:
+    def update(self, update_stmt: str,
+               data: tuple | None = None
+               ) -> int | None:
         '''
         For SQL UPDATE statments
 
@@ -171,7 +173,7 @@ class DB_Connection():
         with self._start_cursor() as cur:
             try:
                 # Execute the INSERT statement for each row in the DataFrame
-                cur.execute(update_stmt)
+                cur.execute(update_stmt, vars=data)
                 logging.info(f'Number of row updated: {cur.rowcount}')
                 return cur.rowcount
             except Exception as e:

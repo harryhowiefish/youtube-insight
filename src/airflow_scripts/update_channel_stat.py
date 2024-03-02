@@ -1,4 +1,4 @@
-from src.core import YoutubeAPI, DB_Connection
+from src.core import youtube_api, db_connection
 import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -11,8 +11,8 @@ def main():
     '''
     # setup connections
 
-    db = DB_Connection()
-    youtube = YoutubeAPI()
+    db = db_connection.DB_Connection()
+    youtube = youtube_api.YoutubeAPI()
 
     # get channel_ids
     result = db.query('SELECT channel_id FROM channel')
@@ -23,7 +23,7 @@ def main():
 
     # format it to dataframe
     stat_df = pd.DataFrame(results)
-    print(stat_df.columns)
+    logging.info(stat_df.columns)
     stat_df = stat_df.astype({'view_count': 'int', 'video_count': 'int',
                               'sub_count': 'int'})
     stat_df.to_csv('channel_stats.csv', index=False)

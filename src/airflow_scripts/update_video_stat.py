@@ -1,4 +1,4 @@
-from src.core import YoutubeAPI, DB_Connection
+from src.core import youtube_api, db_connection
 import pandas as pd
 import numpy as np
 import logging
@@ -12,8 +12,8 @@ def main():
     '''
 
     # setup
-    youtube = YoutubeAPI()
-    db = DB_Connection()
+    youtube = youtube_api.YoutubeAPI()
+    db = db_connection.DB_Connection()
 
     # query list of video to call API.
     result = db.query('SELECT video_id FROM video where active = True')
