@@ -1,25 +1,43 @@
 import sys
+import os
 import logging
 import pandas as pd
-from src.core import DB_Connection, YoutubeAPI
+from src.core import youtube_api, db_connection
 
 logging.basicConfig(level=logging.INFO)
 
 
 def main():
-
-    # crawl channel listing on search page using selenium
+    if len(sys.argv) < 2:
+        logging.error('Please provide txt file')
+        return
+    # check path
     path = sys.argv[1]
+    if path[-4:] != '.txt':
+        logging.error('Please provide file that ends with .txt')
+        return
+    elif not os.path.exists(os.path.join(os.curdir, path)):
+        logging.error(f'File {path} does not exist.')
+        return
+
+    # load text to list
     with open(path) as f:
         txt = f.read()
     channels = txt.replace(' ', '').split(',')
-    youtube = YoutubeAPI()
-    db = DB_Connection()
+
+    # create connections
+    youtube = youtube_api.YoutubeAPI()
+    db = db_connection.DB_Connection()
 
     # get channel information using youtube API
     channel_info = []
     for channel in channels:
-        channel_info.append(youtube.get_channel_info(channel))
+        data = youtube.get_channel_info(channel)
+        if data:
+            channel_info.append(data)
+    if not channel_info:
+        logging.warning('No valid channel_id provided.')
+        return
     channel_df = pd.DataFrame(channel_info)
 
     # adding final result to DB

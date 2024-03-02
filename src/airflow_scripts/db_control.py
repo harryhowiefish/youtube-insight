@@ -2,22 +2,16 @@ import boto3
 import time
 import os
 import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 def main():
     '''
     This script creates a faster way to switch on/off AWS RDS.
-    AWS credential is required for this to work.
+    .aws in root directory is required for this to work.
     '''
-
-    # Parser setting
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-set', '--set_status', help='turn db on or off',
-                        choices=['on', 'off'])
-    parser.add_argument('-check', '--check_status',
-                        help='return db current status',
-                        action='store_true')
-    args = parser.parse_args()
+    args = parse_args()
 
     # AWS connection setup
     os.environ['AWS_PROFILE'] = "boto3"
@@ -26,24 +20,22 @@ def main():
     db_name = 'youtube-db'
 
     # get db current status
-    info = client.describe_db_instances(
-        DBInstanceIdentifier=db_name)['DBInstances'][0]
-    status = info['DBInstanceStatus']
+    status = get_db_status(client, db_name)
 
     #  no args provided
     if not any(vars(args).values()):
-        print('Please provide arguments, or check --help for info.')
+        logging.info('Please provide arguments, or check --help for info.')
         return
 
     elif args.check_status:
-        print(f"DB status is: {status}")
+        logging.info(f"DB status is: {status}")
 
     elif args.set_status == 'on':
         if status == 'available':
-            print('DB already running')
+            logging.info('DB already running')
             return
         elif status != 'stopped':
-            print(f"""Cannot interact with DB.
+            logging.info(f"""Cannot interact with DB.
                   Current status is {status}""")
             raise ConnectionError('DB failed to start')
 
@@ -52,40 +44,83 @@ def main():
             DBInstanceIdentifier='youtube-db')
 
         # wait until db launch complete
-        while True:
-            info = client.describe_db_instances(
-                DBInstanceIdentifier=db_name)['DBInstances'][0]
-            if info['DBInstanceStatus'] in ['starting',
-                                            'Configuring-enhanced-monitoring',
-                                            'configuring-enhanced-monitoring']:  # noqa
-                print('DB is starting...')
-                time.sleep(30)
-            elif info['DBInstanceStatus'] == 'available':
-                print('DB started successfully')
-                return
-            else:
-                print('start process was not successful')
-                print(f"status is {info['DBInstanceStatus']}")
-                raise ConnectionError('DB failed to start')
+        db_polling(client, db_name, waiting_for='available')
 
     elif args.set_status == 'off':
         if status == 'stopped':
-            print('DB already stopped.')
+            logging.info('DB already stopped.')
             return
         # Start shutdown processes
         client.stop_db_instance(
             DBInstanceIdentifier='youtube-db')
 
         # wait until db shutdown complete
-        while True:
-            info = client.describe_db_instances(
-                DBInstanceIdentifier=db_name)['DBInstances'][0]
-            if info['DBInstanceStatus'] == 'stopped':
-                print('DB shutdown successfully')
-                return
-            else:
-                print('DB is shutting down...')
-                time.sleep(30)
+        db_polling(client, db_name, waiting_for='stopped')
+
+
+def get_db_status(client, db_name: str) -> str:
+    '''
+    Parse status from describe_db_instances method's result.
+
+    Parameters
+    ----------
+    client: boto3.client.RDS
+
+    RDS client
+
+    db_name : str
+
+    DB name on AWS
+
+    Returns:
+    -------
+    status : str
+    '''
+    info = client.describe_db_instances(
+        DBInstanceIdentifier=db_name)['DBInstances'][0]
+    return info['DBInstanceStatus']
+
+
+def parse_args(args=None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-set', '--set_status', help='turn db on or off',
+                        choices=['on', 'off'])
+    parser.add_argument('-check', '--check_status',
+                        help='return db current status',
+                        action='store_true')
+    return parser.parse_args(args)
+
+
+def db_polling(client, db_name: str, waiting_for: str) -> None:
+    '''
+    Continously check in on status until change complete.
+
+    Parameters
+    ----------
+    client: boto3.client.RDS
+
+    RDS client
+
+    db_name : str
+
+    DB name on AWS
+
+    waiting_for : str
+
+    The status you expect to recieve.
+
+    Returns:
+    -------
+    None
+    '''
+    while True:
+        status = get_db_status(client, db_name)
+        if status == waiting_for:
+            logging.info(f'DB {waiting_for}.')
+            return
+        else:
+            logging.info('DB is changing status...')
+            time.sleep(30)
 
 
 if __name__ == '__main__':

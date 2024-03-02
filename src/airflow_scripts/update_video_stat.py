@@ -1,4 +1,4 @@
-from src.core import YoutubeAPI, DB_Connection
+from src.core import youtube_api, db_connection
 import pandas as pd
 import numpy as np
 import logging
@@ -12,24 +12,21 @@ def main():
     '''
 
     # setup
-    youtube = YoutubeAPI()
-    db = DB_Connection()
+    youtube = youtube_api.YoutubeAPI()
+    db = db_connection.DB_Connection()
 
     # query list of video to call API.
     result = db.query('SELECT video_id FROM video where active = True')
     video_ids = [item[0] for item in result]
 
     # youtube API call
-    results = []
-    for id in video_ids:
-        result = youtube.get_video_stat(id)
-        if result:
-            results.append(result)
+
+    results = youtube.multiple_videos_stat(video_ids)
 
     # create dataframe and save
     stat_df = pd.DataFrame(results)
     stat_df = stat_df.replace([np.nan], [None])
-    # stat_df.to_csv('video_stats.csv', index=False)
+    stat_df.to_csv('video_stats.csv', index=False)
 
     # insert all video stat into database
     insert_stmt = f"""

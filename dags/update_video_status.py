@@ -12,14 +12,13 @@ default_args = {
 def status_update():
     from src.core import DB_Connection
     db = DB_Connection()
-    rowcount = db.update(
+    db.update(
         '''
           update video
           set active = False
           where published_date < current_date - interval '30 day'
           and active = True
-          ''')
-    print(f'Number of row updated: {rowcount}')
+        ''')
 
 
 update_video_status = DAG(
@@ -45,7 +44,7 @@ sql_update = PythonOperator(
 
 end_task = BashOperator(
         task_id='initiate_shutdown',
-        bash_command='cd /opt/airflow && src/python airflow_scripts/db_control.py -set off',  # noqa
+        bash_command='cd /opt/airflow && python src/airflow_scripts/db_control.py -set off',  # noqa
         dag=update_video_status,
         execution_timeout=timedelta(minutes=20)
     )
