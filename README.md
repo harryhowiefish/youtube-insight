@@ -1,5 +1,7 @@
 # Youtube Insights
 
+[![codecov](https://codecov.io/gh/harryhowiefish/youtube-insight/graph/badge.svg?token=chwXszvHwr)](https://codecov.io/gh/harryhowiefish/youtube-insight)
+
 <!-- ## Introduction -->
 Want to gain insight on youtube channels? This is the tool for you! 
 
@@ -13,15 +15,15 @@ This repo include tools to pull stats from youtube via youtube data API and cust
 
 ## Tools used
 
-- Python packages - Selenium, psycopg2, Plotly
+- Python packages -p andas, psycopg2, plotly, boto3, 
 - Database - Postgres
-- Orchestration/container - Docker
+- Orchestration/container - Docker, Airflow
 
 ## Usage
 
 ### Setup
 
-Follow sample.json to create your secrets.json file.
+Follow .env.sample to create your .ENV file.
 Please follow instructions [here](https://developers.google.com/youtube/v3/getting-started) to set up Youtube API key.
 
 ### Run Postgres docker
@@ -34,7 +36,7 @@ docker run --name youtube_db -v mydbdata:/var/lib/postgresql/data -p 5432:5432 -
 
 option 1: search with channel keyword
 ```
-python3 search_channel_id.py <keyword>
+python3 src/add_channels/search_channel_id.py <keyword>
 
 >> Is this channel <keyword> correct? 
 >> 1 for Yes, 2 for No: 1
@@ -50,7 +52,7 @@ option 2: add with channel ids (txt file)
 UCvw1LiGdyulhnGksJlGWB6g,UCGbshtvS9t-8CW11W7TooQg
 ```
 ```
-python3 add_channel_listing.py channel_id.txt
+python3 src/add_channels/add_channel_listing.py channel_id.txt
 ```
 
 ### Run Airflow server (connecting to AWS RDS for postgres Database)
@@ -70,7 +72,6 @@ use the notebooks in the visualization folder to explore insights into your sele
 - 1 day crawl for the 30 days
 - interactive plotly
 - dashboard with dash
-- count video and shorts during daily insert
 - add hive, mongodb integration
 - directly connect postgres to airflow.
 - add file cleanup code for airflow + other airflow optimization
@@ -79,9 +80,6 @@ use the notebooks in the visualization folder to explore insights into your sele
 ## Issues
 - set video status with time (change db setting)
 - add status to missing video can't find
-- up test coverage
-    - add fake .env path to test
-    - remember to test duplicate during crawling (shouldn't happen)
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)
