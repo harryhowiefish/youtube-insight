@@ -15,7 +15,7 @@ This repo include tools to pull stats from youtube via youtube data API and cust
 
 ## Tools used
 
-- Python packages -p andas, psycopg2, plotly, boto3, 
+- Python packages - pandas, psycopg2, plotly, boto3, 
 - Database - Postgres
 - Orchestration/container - Docker, Airflow
 

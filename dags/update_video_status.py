@@ -5,7 +5,8 @@ from airflow.operators.bash import BashOperator
 
 default_args = {
     'owner': 'Harry',
-    'retries': 0
+    'retries': 1,
+    'retry_delay': timedelta(minutes=1)
 }
 
 
