@@ -76,6 +76,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 - directly connect postgres to airflow.
 - add file cleanup code for airflow + other airflow optimization
 - add dataclass for data validation during data crawling
+- add Slowly Changing Dimensions (SCD) to video info
 
 ## Issues
 1. set video status with time (change db setting)
