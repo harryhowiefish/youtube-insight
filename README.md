@@ -5,19 +5,26 @@
 <!-- ## Introduction -->
 Want to gain insight on youtube channels? This is the tool for you! 
 
-This repo include tools to pull stats from youtube via youtube data API and custom crawler. Along with some common visualization notebooks to help you gain insight to the channels you're following
+This repo include tools to pull statistics from youtube via youtube data API and custom crawler. Along with some common visualization notebooks (in both pandas and pyspark) to help you gain insight to the channels you're following.
 
+The current setup in this repo contain 2 main DAGs for insert and update the OLTP database, along with an additional DAG for DB control.
+
+### ER diagram for OLTP
+![OLTP ER diagram](images/OLTP_ERD.png)
+### Visualization examples
 ![channel distribution](images/channel_distribution.png)
 ![duration view relation](images/duration_view_relation.png)
 ![view-sub ratio](images/view_sub_ratio.png)
 
 
-
 ## Tools used
 
-- Python packages - pandas, psycopg2, plotly, boto3, 
-- Database - Postgres
-- Orchestration/container - Docker, Airflow
+- Python packages 
+    - database related:psycopg2, boto3
+    - data processing: pandas, pyspark
+    - data visualization: plotly
+- Database: Postgres
+- Orchestration/container: Docker, Airflow
 
 ## Usage
 
@@ -76,6 +83,7 @@ use the notebooks in the visualization folder to explore insights into your sele
 - directly connect postgres to airflow.
 - add file cleanup code for airflow + other airflow optimization
 - add dataclass for data validation during data crawling
+- add Slowly Changing Dimensions (SCD) to video info
 
 ## Issues
 1. set video status with time (change db setting)
