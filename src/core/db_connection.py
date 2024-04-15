@@ -57,7 +57,7 @@ class DB_Connection():
         Create a contextmanager for db connection to shuts down after use.
         Autocommit sql transaction.
         '''
-        conn = psycopg2.connect(self.conn_string, connect_timeout=30)
+        conn = psycopg2.connect(self.conn_string, connect_timeout=240)
         cur = conn.cursor()
         try:
             yield cur
