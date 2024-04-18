@@ -5,12 +5,17 @@
 <!-- ## Introduction -->
 Want to gain insight on youtube channels? This is the tool for you! 
 
-This repo include tools to pull statistics from youtube via youtube data API and custom crawler. Along with some common visualization notebooks (in both pandas and pyspark) to help you gain insight to the channels you're following.
+This repo include all the tools for any youtube analytical needs. From web scraper using custom crawler and youtube API to gather information on specified channels, RDB designed to store them, to ETL pipeline that transform the raw data to analytical tables that provides insights. Ideal for companies looking for sponsorship opportunities and people who are interested in the landscape.
 
-The current setup in this repo contain 2 main DAGs for insert and update the OLTP database, along with an additional DAG for DB control.
+The current setup in this repo contain 4 DAGs. Two for insert and update the OLTP database. The third being a monthly ETL pipeline. And the last DAG for DB control (optional use for AWS RDS).
 
 ### ER diagram for OLTP
 ![OLTP ER diagram](images/OLTP_ERD.png)
+
+### ER diagram for OLAP
+![OLAP ER diagram](images/OLAP_ERD.png)
+
+
 ### Visualization examples
 ![channel distribution](images/channel_distribution.png)
 ![duration view relation](images/duration_view_relation.png)
@@ -19,11 +24,13 @@ The current setup in this repo contain 2 main DAGs for insert and update the OLT
 
 ## Tools used
 
-- Python packages 
-    - database related:psycopg2, boto3
-    - data processing: pandas, pyspark
+- Python packages
+    - crawler: requests
+    - database related: psycopg2, boto3
+    - data processing: pyspark
     - data visualization: plotly
-- Database: Postgres
+
+- Database: Postgres, (parquet and csv for pipeline checkpoints)
 - Orchestration/container: Docker, Airflow
 
 ## Usage
@@ -74,9 +81,8 @@ docker compose up -d
 use the notebooks in the visualization folder to explore insights into your selected channels.
 
 ## Working progress
-- 30 minute crawl for the first 24 hours
-- 6 hour crawl for the first 7 days
-- 1 day crawl for the 30 days
+- Modify ETL so less data is loaded everytime
+- Rename OLAP columns, save to database (maybe mongo?)
 - interactive plotly
 - dashboard with dash
 - add hive, mongodb integration
@@ -86,8 +92,8 @@ use the notebooks in the visualization folder to explore insights into your sele
 - add Slowly Changing Dimensions (SCD) to video info
 
 ## Issues
-1. set video status with time (change db setting)
 2. add status to missing video can't find
+3. DB stores commas which causes issue during csv progessing
 
 ## Resources
 [youtube data API documentation](https://developers.google.com/youtube/v3/docs)

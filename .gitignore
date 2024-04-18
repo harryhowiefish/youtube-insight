@@ -153,9 +153,10 @@ cython_debug/
 secrets.json
 aws_db_on_off.py
 daily_update.sh
-testing.ipynb
+*.ipynb
 .DS_Store
 .vscode
 logs/*
 config/airflow.cfg
 !test/test_data/.ENV
+postgresql-42.6.2.jar
