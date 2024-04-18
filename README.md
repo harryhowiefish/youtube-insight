@@ -24,11 +24,13 @@ The current setup in this repo contain 4 DAGs. Two for insert and update the OLT
 
 ## Tools used
 
-- Python packages 
-    - database related:psycopg2, boto3
-    - data processing: pandas, pyspark
+- Python packages
+    - crawler: requests
+    - database related: psycopg2, boto3
+    - data processing: pyspark
     - data visualization: plotly
-- Database: Postgres
+
+- Database: Postgres, (parquet and csv for pipeline checkpoints)
 - Orchestration/container: Docker, Airflow
 
 ## Usage
