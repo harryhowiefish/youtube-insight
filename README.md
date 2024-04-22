@@ -12,8 +12,8 @@ The current setup in this repo contain 4 DAGs. Two for insert and update the OLT
 ### ER diagram for OLTP
 ![OLTP ER diagram](images/OLTP_ERD.png)
 
-### ER diagram for OLAP
-![OLAP ER diagram](images/OLAP_ERD.png)
+### Fact and dimension table for data warehouse
+![data warehouse ER diagram](images/data_warehouse_ERD.png)
 
 
 ### Visualization examples
